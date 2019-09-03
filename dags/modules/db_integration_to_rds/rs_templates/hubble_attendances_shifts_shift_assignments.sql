@@ -1,0 +1,15 @@
+
+create table hubble_attendances_shifts_shift_assignments
+(
+shift_assignment_id integer,
+shift_assignment_shift_id integer,
+shift_assignment_workforces_profile_id integer,
+shift_assignment_shift_start_time timestamp without time zone,
+shift_assignment_shift_end_time timestamp without time zone,
+shift_assignment_date date,
+shift_assignment_created_at timestamp without time zone,
+shift_assignment_updated_at timestamp without time zone,
+shift_assignment_schedule_id integer,
+shift_assignment_late_attendance_id integer,
+shift_assignment_client_id smallint
+)

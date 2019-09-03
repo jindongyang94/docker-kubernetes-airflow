@@ -3,6 +3,9 @@ services:
     redis:
         image: 'redis:5.0.5'
         # command: redis-server --requirepass redispass
+        labels:
+            company: hubble
+            name: redis
 
     postgres:
         image: postgres:9.6
@@ -14,23 +17,29 @@ services:
         #     - PGDATA=/var/lib/postgresql/data/pgdata
         # volumes:
         #     - ./pgdata:/var/lib/postgresql/data/pgdata
+        labels:
+            company: hubble
+            name: database
 
     webserver:
-        image: puckel/docker-airflow:1.10.4
+        image: hubble/docker-airflow:latest
         restart: always
         depends_on:
             - postgres
             - redis
         environment:
             - LOAD_EX=n
-            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - FERNET_KEY=ttbraK5ptmedcL9yP2NPP5w7xpWfZDSfim0a2MWzuZ4=
             - EXECUTOR=Celery
             # - POSTGRES_USER=airflow
             # - POSTGRES_PASSWORD=airflow
             # - POSTGRES_DB=airflow
             # - REDIS_PASSWORD=redispass
         volumes:
-            - ./dags:/usr/local/airflow/dags
+            # Make sure you have .aws/credentials and .pgpass file in your root home in your local computer.
+            # This is only used for local testing as docker-compose would not be used for deployment on AWS EKS.
+            - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+            - ~/.pgpass:/usr/local/airflow/.pgpass
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         ports:
@@ -41,9 +50,12 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+        labels:
+            company: hubble
+            name: webserver
 
     flower:
-        image: puckel/docker-airflow:1.10.4
+        image: hubble/docker-airflow:latest
         restart: always
         depends_on:
             - redis
@@ -53,40 +65,56 @@ services:
         ports:
             - "5555:5555"
         command: flower
+        labels:
+            company: hubble
+            name: flower
 
     scheduler:
-        image: puckel/docker-airflow:1.10.4
+        image: hubble/docker-airflow:latest
         restart: always
         depends_on:
             - webserver
         volumes:
-            - ./dags:/usr/local/airflow/dags
+            # Make sure you have .aws/credentials and .pgpass file in your root home in your local computer.
+            # This is only used for local testing as docker-compose would not be used for deployment on AWS EKS.
+            - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+            - ~/.pgpass:/usr/local/airflow/.pgpass
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         environment:
             - LOAD_EX=n
-            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - FERNET_KEY=ttbraK5ptmedcL9yP2NPP5w7xpWfZDSfim0a2MWzuZ4=
             - EXECUTOR=Celery
             # - POSTGRES_USER=airflow
             # - POSTGRES_PASSWORD=airflow
             # - POSTGRES_DB=airflow
             # - REDIS_PASSWORD=redispass
         command: scheduler
+        labels:
+            company: hubble
+            name: scheduler
 
     worker:
-        image: puckel/docker-airflow:1.10.4
+        # scale workers using: < docker-compose -f docker-compose-CeleryExecutor.yml scale worker=5 >
+        image: hubble/docker-airflow:latest
         restart: always
         depends_on:
             - scheduler
         volumes:
-            - ./dags:/usr/local/airflow/dags
+            # Make sure you have .aws/credentials and .pgpass file in your root home in your local computer.
+            # This is only used for local testing as docker-compose would not be used for deployment on AWS EKS.
+            - ~/.aws/credentials:/usr/local/airflow/.aws/credentials
+            - ~/.pgpass:/usr/local/airflow/.pgpass
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         environment:
-            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - FERNET_KEY=ttbraK5ptmedcL9yP2NPP5w7xpWfZDSfim0a2MWzuZ4=
             - EXECUTOR=Celery
             # - POSTGRES_USER=airflow
             # - POSTGRES_PASSWORD=airflow
             # - POSTGRES_DB=airflow
             # - REDIS_PASSWORD=redispass
         command: worker
+        labels:
+            company: hubble
+            name: worker

@@ -5,7 +5,7 @@
 # SOURCE: https://github.com/puckel/docker-airflow
 
 FROM python:3.7-slim-stretch
-LABEL maintainer="Puckel_"
+LABEL maintainer="Hubble_"
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -70,8 +70,10 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
+COPY ./requirements.txt /requirements.txt
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
+COPY /dags ${AIRFLOW_USER_HOME}/dags
 
 RUN chown -R airflow: ${AIRFLOW_USER_HOME}
 
