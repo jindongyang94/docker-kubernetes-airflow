@@ -2,10 +2,12 @@ import airflow
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.subdag_operator import SubDagOperator
 
 from modules.db_integration_to_rds.auto_transfer import handler as centralizedrds_pipeline_daily
-from modules.db_integration_to_s3.daily_migration import handler as s3_pipeline_daily
-from modules.db_integration_to_s3.periodic_dump import handler as s3_pipeline_periodic
+from modules.db_integration_to_s3.daily_migration import describe_all_instances
+from subdags.subdag_migration_s3 import subdag_factory as subdag_s3
+
 
 from datetime import timedelta
 
@@ -16,43 +18,52 @@ using airflow to schedule and sequence every task in place.
 
 ##############################################################################################################################
 # Daily DAG Pipeline ---------------------------------------------------------------------------------------------------------
+PARENT_DAG_NAME = 'daily_etl_pipeline'
+S3_SUBDAG_NAME = 's3_pipeline'
 
 default_args = {
     'owner': 'airflow',
-    'start_date': airflow.utils.dates.days_ago(0),
+    'start_date': '2019-09-06',
     'depends_on_past': False,
     'email': ['dongyang@hubble.sg'],
     'email_on_failure': True,
     'email_on_retry': False,
+    'email_on_success': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5)
 }
 
 with DAG(
-    dag_id = 'daily_pipeline_service',
-    description = 'This pipeline is to instantiate both daily pipelines at one go.',
+    dag_id = PARENT_DAG_NAME,
+    description = 'This pipeline is to encapsulate all pipelines needed to run daily.',
     default_args = default_args,
     # We are running at 4pm as the timezone is set to be UTC by default - this translates to 12am in SGT.
     schedule_interval = '0 16 * * *',
 ) as dag:
 
-    t0 = DummyOperator(
+    start_task = DummyOperator(
         task_id = 'start_of_daily_pipeline'
     )
         
-    t1a_daily_rds = PythonOperator(
-        task_id = 'daily_rds_to_rds_to_redshift_pipeline',
+    daily_rds_task = PythonOperator(
+        task_id = 'rds_redshift_pipeline',
         # provide_context = True,
         python_callable = centralizedrds_pipeline_daily
     )
 
-    t1b_daily_s3 = PythonOperator(
-        task_id = 'daily_rds_to_s3_pipeline',
-        # provide_context = True,
-        python_callable = s3_pipeline_daily
+    instance_extraction_task = PythonOperator(
+        task_id = 'describe_all_instances',
+        python_callable = describe_all_instances
     )
 
-    t0 >> [t1a_daily_rds, t1b_daily_s3]
+    daily_s3_task = SubDagOperator(
+        task_id = S3_SUBDAG_NAME,
+        subdag = subdag_s3(PARENT_DAG_NAME, S3_SUBDAG_NAME, dag.start_date, dag.schedule_interval, \
+            "{{ ti.xcom_pull(task_ids='describe_all_instances', dag_id='" + PARENT_DAG_NAME + "' }}")
+    )
 
-########################################################################################################################
-# Periodic (Monthly) DAG Pipeline -----------------------------------------------------------------------------------
+    end_task = DummyOperator(
+        task_id = 'end_daily_pipeline'
+    )
+
+    start_task >> [daily_rds_task, daily_s3_task] >> end_task

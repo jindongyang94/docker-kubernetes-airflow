@@ -1,8 +1,9 @@
 # VERSION 1.10.4
 # AUTHOR: Matthieu "Puckel_" Roisil
-# DESCRIPTION: Basic Airflow container
-# BUILD: docker build --rm -t puckel/docker-airflow .
-# SOURCE: https://github.com/puckel/docker-airflow
+# EDITOR: Hubble SG
+# DESCRIPTION: Basic Airflow container for Hubble ETL
+# BUILD: docker build --rm -t hubble.docker-airflow .
+# SOURCE: https://gitlab.com/hubble-sg/data/docker-airflow.git
 
 FROM python:3.7-slim-stretch
 LABEL maintainer="Hubble_"
@@ -17,6 +18,8 @@ ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
+ENV PYTHONPATH="$PYTHONPATH/:${AIRFLOW_USER_HOME}/subdags"
+ENV PYTHONPATH="$PYTHONPATH/:${AIRFLOW_USER_HOME}/modules"
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -74,6 +77,8 @@ COPY ./requirements.txt /requirements.txt
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 COPY /dags ${AIRFLOW_USER_HOME}/dags
+COPY /subdags ${AIRFLOW_USER_HOME}/subdags
+COPY /modules ${AIRFLOW_USER_HOME}/modules
 
 RUN chown -R airflow: ${AIRFLOW_USER_HOME}
 

@@ -47,6 +47,44 @@ logger = create_logger()
 
 DATALAKE_NAME = 'hubble-datalake1'
 
+# The tag or name of the instance we want to enter
+INSTANCE_TAGS = [
+        {
+            'Name': 'db-instance-id',
+            'Values': [
+                'arn:aws:rds:us-west-2:175416825336:db:proddbreplica'
+            ]
+        }
+    ] 
+
+# The given companies
+DATABASE_TAGS = [
+        "alric",
+        "hsc",
+        "bms",
+        "cleansolution",
+        "lumchang",
+        "firstcom",
+        "multiscaff",
+        "sante",
+        "tongloong",
+        "oas",
+        "sck",
+        "kkl",
+        "primestructures",
+        "hexacon",
+        "hitek",
+        "wohhup",
+        "keppelshipyard",
+        "greatearth",
+        "seiko",
+        "weehur",
+        "boustead"
+    ]
+
+# The given tables 
+TABLE_TAGS = None
+
 # Class Methods (Should encapsulate all s3 and rds methods to make the work easier to undestand) ----------------------------------
 class S3Helper:
     """

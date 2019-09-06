@@ -6,5 +6,5 @@
 # DO NOT USE THIS FILE YET. IT IS NOT COMPLETE.
 
 docker build --rm -t hubble/docker-airflow:latest .
-docker tag dc654045dcce 175416825336.dkr.ecr.ap-southeast-1.amazonaws.com/airflow:1.01.2
+docker tag $(shell docker images hubble/docker-airflow:latest) 175416825336.dkr.ecr.ap-southeast-1.amazonaws.com/airflow:1.01.2
 docker push 175416825336.dkr.ecr.ap-southeast-1.amazonaws.com/airflow:1.01.2
