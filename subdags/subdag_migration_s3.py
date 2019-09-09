@@ -1,16 +1,16 @@
 import airflow
-from airflow.settings import Session
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.executors.local_executor import LocalExecutor
 
-from modules.db_integration_to_s3.daily_migration import individual_company_migration, describe_all_instances, \
-    logger, TABLE_TAGS
+from modules.db_integration_to_s3.daily_migration import individual_company_migration, RDSHelper, S3Helper, PGHelper, \
+    logger, DATALAKE_NAME, DATABASE_TAGS, INSTANCE_TAGS, TABLE_TAGS
 
 from datetime import timedelta
 
 
-def subdag_factory(parent_dag_name, child_dag_name, start_date, schedule_interval, default_args, parent_dag=None):
+def subdag_factory(parent_dag_name, child_dag_name, start_date, schedule_interval, db_dictionary):
     """
     To encompass breaking down of tasks with one connection per company database.
     """
@@ -18,15 +18,14 @@ def subdag_factory(parent_dag_name, child_dag_name, start_date, schedule_interva
         dag_id='{0}.{1}'.format(parent_dag_name, child_dag_name),
         schedule_interval=schedule_interval,
         start_date=start_date,
-        default_args=default_args,
+        executor= LocalExecutor(),
         catchup=False)
 
-
     with subdag:
-        db_dictionary = describe_all_instances()
         
         dbs = db_dictionary.keys()
-        logger.info("Instances List: %s" % dbs)
+        logger.info("Instances List: %s" %
+                    list(map(lambda x: x['DBInstanceIdentifier'], dbs)))
 
         for db_item in db_dictionary.values():
             # First index is the db instance details
@@ -63,8 +62,7 @@ def subdag_factory(parent_dag_name, child_dag_name, start_date, schedule_interva
                         'database_name' : database_name,
                         'table_filters' : TABLE_TAGS
                     },
-                    default_args=default_args,
-                    dag=subdag
+                    dag = subdag
                 )
 
         return subdag

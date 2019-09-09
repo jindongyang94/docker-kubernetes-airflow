@@ -150,6 +150,7 @@ def individual_company_migration(instance_details, database_name, table_filters)
                     latest_csvtimestamp = '0' * 24
                 
                 csvname = table_name + "-" + latest_csvtimestamp + ".csv"
+                local_csvname = database_name + "-" + csvname
 
                 # Respective paths needed
                 full_folder_path = ("%s/%s/%s/%s") % (DATALAKE_NAME, instance, database_name, table_name)
@@ -163,7 +164,7 @@ def individual_company_migration(instance_details, database_name, table_filters)
                 # If we could not get a proper timestamp from s3, it means there is no initial file. 
                 if not table_timestamp:
                     logger.info ("No CSV found in the respective S3 folder. Exporting all rows from table %s to csv." %  table_name)
-                    local_csvpath = '/tmp/' + csvname
+                    local_csvpath = '/tmp/' + local_csvname
                     with open(local_csvpath, "w") as csvfile:
                         # Get all of the rows and export them
                         export_query = "COPY " + table_name + " TO STDOUT WITH CSV HEADER"
@@ -213,7 +214,7 @@ def individual_company_migration(instance_details, database_name, table_filters)
 
                 # Deleting file from /tmp/ after use
                 os.remove(local_csvpath)
-                logger.info ('Local File Deleted')
+                logger.info ('Local File Deleted: %s' % local_csvpath)
                 logger.info('\n')
                 break
             
@@ -437,7 +438,7 @@ def handler(event=None, context=None):
     # The related modules needed
     # correct_tables = []
 
-    run(instance_filters=instance_tags, database_filters=database_tags)
+    full_database_migration(instance_filters=instance_tags, database_filters=database_tags)
 
     end = time.time()
     seconds = end - start

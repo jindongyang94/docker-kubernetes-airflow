@@ -1,4 +1,4 @@
-.PHONY: compose build
+.PHONY: compose build kill webserver scheduler worker pushcurrent pushnext
 build:
 	docker build --rm -t hubble/docker-airflow:latest .
 
@@ -18,3 +18,9 @@ scheduler:
 
 worker:
 	docker exec -it $(shell docker ps -q --filter label=name=worker) /entrypoint.sh bash
+
+pushcurrent: build
+	sh push_docker.sh push_current
+
+pushnext: build
+	sh push_docker.sh push_next
