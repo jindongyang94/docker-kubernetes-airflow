@@ -3,6 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.subdag_operator import SubDagOperator
+from airflow.executors.local_executor import LocalExecutor
 
 from modules.db_integration_to_rds.auto_transfer import handler as centralizedrds_pipeline_daily
 from modules.db_integration_to_s3.daily_migration import describe_all_instances
@@ -51,19 +52,17 @@ with DAG(
         python_callable = centralizedrds_pipeline_daily
     )
 
-    instance_extraction_task = PythonOperator(
-        task_id = 'describe_all_instances',
-        python_callable = describe_all_instances
-    )
-
     daily_s3_task = SubDagOperator(
         task_id = S3_SUBDAG_NAME,
-        subdag = subdag_s3(PARENT_DAG_NAME, S3_SUBDAG_NAME, dag.start_date, dag.schedule_interval, \
-            "{{ ti.xcom_pull(task_ids='describe_all_instances', dag_id='" + PARENT_DAG_NAME + "' }}")
+        subdag = subdag_s3(PARENT_DAG_NAME, S3_SUBDAG_NAME, dag.start_date, dag.schedule_interval, dag.default_args, \
+            parent_dag=dag),
+        executor= LocalExecutor(),
+        default_args=default_args
     )
 
     end_task = DummyOperator(
         task_id = 'end_daily_pipeline'
     )
 
-    start_task >> [daily_rds_task, daily_s3_task] >> end_task
+    start_task >> [daily_rds_task, daily_s3_task]
+    [daily_rds_task, daily_s3_task] >> end_task
