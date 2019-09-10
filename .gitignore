@@ -26,6 +26,7 @@ sftp-config.json
 
 # Python
 __pycache__
+*.pyc
 
 # YAML Files
 secrets.yaml

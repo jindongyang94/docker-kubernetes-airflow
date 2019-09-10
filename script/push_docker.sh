@@ -26,13 +26,15 @@ case "$1" in
     next)
         echo "Building Next Tag: $AIRFLOW_ECR_DOCKER:$AIRFLOW_NEXT_ECR_TAG"
         docker build --rm -t ${AIRFLOW_LOCAL_DOCKER}:${AIRFLOW_LOCAL_TAG} .
-        docker tag $(docker images hubble/docker-airflow:latest) ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_NEXT_ECR_TAG}
+        $(aws ecr get-login --no-include-email --region ap-southeast-1)
+        docker tag hubble/docker-airflow:latest ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_NEXT_ECR_TAG}
         docker push ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_NEXT_ECR_TAG}
         ;;
     current)
         echo "Building Current Tag: $AIRFLOW_ECR_DOCKER:$AIRFLOW_CURRENT_ECR_TAG"
         docker build --rm -t ${AIRFLOW_LOCAL_DOCKER}:${AIRFLOW_LOCAL_TAG} .
-        docker tag $(docker images hubble/docker-airflow:latest) ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_CURRENT_ECR_TAG}
+        $(aws ecr get-login --no-include-email --region ap-southeast-1)
+        docker tag hubble/docker-airflow:latest ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_CURRENT_ECR_TAG}
         docker push ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_CURRENT_ECR_TAG}
         ;;
 esac
