@@ -20,7 +20,7 @@ worker:
 	docker exec -it $(shell docker ps -q --filter label=name=worker) /entrypoint.sh bash
 
 pushcurrent: build
-	sh push_docker.sh push_current
+	sh push_docker.sh current
 
 pushnext: build
-	sh push_docker.sh push_next
+	sh push_docker.sh next
