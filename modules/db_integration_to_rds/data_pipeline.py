@@ -471,28 +471,28 @@ def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3
     redshift_cur.execute(query)
 
 
-def timerange_data_transfer(periodic_mode='daily',
-                            start_time='',
-                            end_time='',
-                            pivot_time='',
-                            timezone='Singapore',
+def periodic_data_transfer(periodic_mode='daily',
+                           start_time='',
+                           end_time='',
+                           pivot_time='',
+                           timezone='Singapore',
 
-                            client_csv='',
-                            module_table_metadata='',
-                            table_client_metadata='',
+                           client_csv='',
+                           module_table_metadata='',
+                           table_client_metadata='',
 
-                            unused_modules=(),
-                            unused_tables=(),
+                           unused_modules=(),
+                           unused_tables=(),
 
-                            dev_db=None,
-                            prod_db=None,
-                            redshift_db=None,
-                            redshift_iam_role='',
-                            redshift_region='',
-                            s3_bucket='',
+                           dev_db=None,
+                           prod_db=None,
+                           redshift_db=None,
+                           redshift_iam_role='',
+                           redshift_region='',
+                           s3_bucket='',
 
-                            verbose=False,
-                            verbose_mode='info'):
+                           verbose=False,
+                           verbose_mode='info'):
     '''
     Transfer data between start time and end time
     :param periodic_mode:
@@ -672,22 +672,22 @@ if __name__ == '__main__':
 
     pprint(cfg)
 
-    timerange_data_transfer(periodic_mode=cfg['periodic_mode'],
-                            start_time=cfg['start_time'],
-                            end_time=cfg['end_time'],
-                            pivot_time=cfg['pivot_time'],
-                            timezone=cfg['timezone'],
+    periodic_data_transfer(periodic_mode=cfg['periodic_mode'],
+                           start_time=cfg['start_time'],
+                           end_time=cfg['end_time'],
+                           pivot_time=cfg['pivot_time'],
+                           timezone=cfg['timezone'],
 
-                            client_csv=cfg['client_csv'],
-                            module_table_metadata=cfg['module_table_meta'],
-                            table_client_metadata=cfg['table_client_meta'],
-                            unused_modules=cfg['unused_modules'],
-                            unused_tables=cfg['unused_tables'],
+                           client_csv=cfg['client_csv'],
+                           module_table_metadata=cfg['module_table_meta'],
+                           table_client_metadata=cfg['table_client_meta'],
+                           unused_modules=cfg['unused_modules'],
+                           unused_tables=cfg['unused_tables'],
 
-                            dev_db=cfg['dev_db'],
-                            prod_db=cfg['client_db'],
-                            redshift_db=cfg['redshift_db'],
-                            redshift_iam_role=cfg['redshift_iam_role'],
-                            redshift_region=cfg['redshift_region'],
-                            s3_bucket=cfg['s3_bucket'],
-                            )
+                           dev_db=cfg['dev_db'],
+                           prod_db=cfg['client_db'],
+                           redshift_db=cfg['redshift_db'],
+                           redshift_iam_role=cfg['redshift_iam_role'],
+                           redshift_region=cfg['redshift_region'],
+                           s3_bucket=cfg['s3_bucket'],
+                           )
