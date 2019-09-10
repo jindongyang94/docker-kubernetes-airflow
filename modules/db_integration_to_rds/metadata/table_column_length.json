@@ -1,0 +1,1026 @@
+{
+    "hubble_projects_teams": {
+        "name": 52
+    },
+    "hubble_users": {
+        "name": 28,
+        "password_digest": 60,
+        "type": 37
+    },
+    "hubble_quality_cases": {
+        "location": 0,
+        "identifier": 21,
+        "soi_ref_num": 34,
+        "backcharge_remark": 0
+    },
+    "hubble_workforces_departments": {
+        "code": 28,
+        "name": 36
+    },
+    "hubble_quality_location_images": {
+        "image": 98,
+        "identifier": 81
+    },
+    "hubble_salaries_ir8as_submissions": {
+        "authorizer_name": 20,
+        "authorizer_designation": 24,
+        "authorizer_email": 24,
+        "telephone_number": 8,
+        "branch_name": 0
+    },
+    "hubble_workforces_profiles": {
+        "name": 61,
+        "gender": 6,
+        "other_race": 17,
+        "other_religion": 12,
+        "marital_status": 9,
+        "passport_number": 18,
+        "nationality": 25,
+        "nin_number": 22,
+        "email": 41,
+        "phone_number": 28,
+        "address": 200,
+        "code": 11,
+        "termination_reason": 345,
+        "remarks": 0,
+        "photo": 49,
+        "fr_photo": 49,
+        "other_dialect": 11,
+        "country_of_birth": 14,
+        "postal_code": 8,
+        "room_number": 45,
+        "foreign_residential_address": 71,
+        "foreign_contact_no": 33,
+        "medical_history": 238,
+        "bank_code": 11,
+        "branch_no": 9,
+        "account_no": 16,
+        "account_name": 49
+    },
+    "hubble_salaries_ir8as_forms": {
+        "unique_entity_number": 10,
+        "nin_number": 9,
+        "name": 38,
+        "nationality": 10,
+        "designation": 0,
+        "block_no": 0,
+        "st_name": 0,
+        "level_no": 0,
+        "unit_no": 0,
+        "postal_code_l": 0,
+        "address_line1": 30,
+        "address_line2": 30,
+        "address_line3": 12,
+        "postal_code_c": 7,
+        "country": 0,
+        "retirement_fund": 0,
+        "designated_pension_or_provident_fund_name": 22
+    },
+    "hubble_batch_file_generation_trackers": {
+        "report_type": 7,
+        "file_name": 88,
+        "s3_directory": 141,
+        "error_msg": 44
+    },
+    "hubble_notification_contexts": {
+        "token": 174,
+        "sub_context": 61
+    },
+    "hubble_quality_qa_request_changes": {
+        "remarks": 72
+    },
+    "hubble_quality_subcontractors": {
+        "company_name": 54,
+        "company_email": 34,
+        "primary_name": 49,
+        "primary_number": 15,
+        "secondary_name": 17,
+        "secondary_number": 8,
+        "code": 18
+    },
+    "hubble_quality_qa_attachments": {
+        "image": 34
+    },
+    "hubble_company_logos": {
+        "logo": 0
+    },
+    "hubble_projects_projects": {
+        "name": 112,
+        "code": 51,
+        "address": 137,
+        "country": 11,
+        "address_alt": 725,
+        "site_in_charge": 56,
+        "site_email": 50,
+        "site_office_number": 12,
+        "main_contractor": 121,
+        "developer": 121
+    },
+    "hubble_leave_entitlement_action_logs": {
+        "remark": 228
+    },
+    "hubble_quality_floorplans": {
+        "zone": 39,
+        "floor": 13,
+        "unit": 15
+    },
+    "hubble_salaries_adjustments_loans": {
+        "name": 19,
+        "description": 38
+    },
+    "hubble_leave_settings_custom_leave_configurations": {
+        "name": 50,
+        "short_description": 130,
+        "long_description": 690
+    },
+    "hubble_quality_wi_trade_clearances": {
+        "sig_name": 10,
+        "sig_trade": 3
+    },
+    "hubble_quality_wi_items": {
+        "name": 134
+    },
+    "hubble_quality_backcharge_labours": {
+        "category": 7
+    },
+    "hubble_freshchat_sessions": {
+        "restore_id": 36
+    },
+    "hubble_quality_backcharge_plants": {
+        "description": 0
+    },
+    "hubble_quality_types": {
+        "category": 9,
+        "name": 104,
+        "subcategory": 29
+    },
+    "hubble_quality_wi_requests": {
+        "ref_num": 18,
+        "drawing_ref": 107,
+        "clearance_remarks": 0,
+        "gridline": 0
+    },
+    "hubble_job_queues_job_buffers": {
+        "class_name": 0,
+        "arguments": 0,
+        "cron": 0,
+        "last_error": 0
+    },
+    "hubble_quality_backcharge_materials": {
+        "description": 8
+    },
+    "hubble_attendances_attendance_remarks": {
+        "remark": 0
+    },
+    "hubble_quality_wi_request_changes": {
+        "remarks": 0
+    },
+    "hubble_user_notifications": {
+        "registration_token": 174
+    },
+    "hubble_quality_qa_requests": {
+        "ref_num": 16,
+        "description": 604,
+        "dimensions": 0,
+        "remedial_action": 765,
+        "manager_remarks": 0,
+        "supervisor_remarks": 43,
+        "subcontractor_remarks": 72,
+        "defect_reason": 16,
+        "soi_ref_number": 21
+    },
+    "hubble_salaries_payrolls_rest_day_items": {
+        "name": 12,
+        "unit": 5
+    },
+    "hubble_attendances_attendances": {
+        "check_in_photo": 18,
+        "check_out_photo": 19,
+        "check_in_fr_photo": 18,
+        "check_out_fr_photo": 19,
+        "check_in_remark": 224,
+        "check_out_remark": 496
+    },
+    "hubble_quality_main_defect_types": {
+        "name": 35,
+        "code": 19
+    },
+    "hubble_quality_sub_defect_types": {
+        "name": 82,
+        "description": 163,
+        "remedial_action": 52
+    },
+    "hubble_quality_reason_for_defects": {
+        "name": 41
+    },
+    "hubble_salaries_adjustments_recurring_deductions": {
+        "name": 29,
+        "code": 29,
+        "applicable_days_rule": 78
+    },
+    "hubble_salaries_adjustments_recurring_deduction_schedules": {
+        "attributable_level_type": 27
+    },
+    "hubble_project_setting_sub_contractors": {
+        "company_name": 39,
+        "company_email": 33,
+        "company_contact_number": 9,
+        "code": 8
+    },
+    "hubble_quality_images": {
+        "imageable_type": 30,
+        "attachment": 7
+    },
+    "hubble_quality_logs": {
+        "action": 29,
+        "remark": 171,
+        "loggable_type": 21
+    },
+    "hubble_project_setting_cc_lists": {
+        "name": 40
+    },
+    "hubble_safety_permit_class_items": {
+        "question": 267,
+        "answer": 337
+    },
+    "hubble_project_setting_floor_plans": {
+        "floor_plan_type": 24,
+        "identifier": 34
+    },
+    "hubble_quality_defects": {
+        "remark": 0,
+        "main_defect_type": 19,
+        "sub_defect_type": 21,
+        "reason_for_defect": 28,
+        "description": 157,
+        "remedial_action": 79,
+        "pin_color": 7
+    },
+    "hubble_project_setting_locations": {
+        "zone": 23,
+        "floor": 15,
+        "unit": 15
+    },
+    "hubble_safety_permit_class_attachments": {
+        "image": 36
+    },
+    "hubble_safety_permit_classes": {
+        "name": 67,
+        "description": 184,
+        "remarks": 229
+    },
+    "hubble_safety_permits": {
+        "gridline": 159,
+        "description": 277,
+        "ref_num": 23,
+        "applicant_name": 176,
+        "mobile_number": 19
+    },
+    "hubble_salaries_adjustments_transport_reimbursements": {
+        "name": 23,
+        "code": 23
+    },
+    "hubble_safety_inspections": {
+        "ref_num": 20,
+        "description": 707,
+        "remedial_action": 360,
+        "fine_reason": 135,
+        "risk_level": 0
+    },
+    "hubble_safety_inspection_log_attachments": {
+        "image": 34
+    },
+    "hubble_project_setting_images": {
+        "imageable_type": 33,
+        "attachment": 84
+    },
+    "hubble_project_setting_floor_plan_types": {
+        "name": 24
+    },
+    "hubble_workforces_red_packet_entries": {
+        "reason": 0
+    },
+    "hubble_rights_action_permissions": {
+        "type": 66
+    },
+    "hubble_safety_hk_request_log_attachments": {
+        "image": 0
+    },
+    "hubble_safety_hk_requests": {
+        "description": 0,
+        "remedial_action": 0,
+        "ref_num": 0,
+        "approval_remarks": 0,
+        "request_remarks": 0
+    },
+    "hubble_workforces_companies": {
+        "code": 7,
+        "name": 52,
+        "id_number": 17,
+        "csn": 15
+    },
+    "hubble_workforces_wage_increment_entries": {
+        "reason": 0,
+        "rating": 0
+    },
+    "hubble_rights_action_policies": {
+        "name": 35,
+        "description": 76
+    },
+    "hubble_workforces_surveys": {
+        "name": 15,
+        "type": 39
+    },
+    "hubble_workforces_worker_renewal_entries": {
+        "reason": 0,
+        "rating": 0,
+        "remarks": 0
+    },
+    "hubble_quality_rectification_reviews": {
+        "remark": 1
+    },
+    "hubble_leave_leave_custom_notifications": {
+        "name": 23
+    },
+    "hubble_quality_rectifications": {
+        "rectifiable_type": 23,
+        "remark": 171
+    },
+    "hubble_project_setting_sub_contractor_accounts": {
+        "name": 17,
+        "code": 10,
+        "designation": 15,
+        "trade": 25,
+        "phone_no": 8,
+        "email": 30
+    },
+    "hubble_safety_permit_class_checklists": {
+        "name": 111,
+        "question": 0,
+        "answer": 0
+    },
+    "hubble_attendances_workdays_configuration_groups": {
+        "name": 31
+    },
+    "hubble_attendances_public_holiday_settings": {
+        "name": 60
+    },
+    "hubble_leave_leave_applications": {
+        "remarks": 143
+    },
+    "hubble_workforces_next_of_kins": {
+        "name": 19,
+        "nationality": 11,
+        "contact_no": 29,
+        "nin_number": 9,
+        "other_relationship": 7,
+        "other_gender": 0,
+        "place_of_residence": 58
+    },
+    "hubble_quality_wi_attachments": {
+        "image": 33
+    },
+    "hubble_workforces_filenames": {
+        "name": 36
+    },
+    "hubble_workforces_files": {
+        "attachment": 66
+    },
+    "hubble_safety_types": {
+        "category": 4,
+        "name": 151,
+        "subcategory": 0
+    },
+    "hubble_workforces_transfers": {
+        "job_grade": 0
+    },
+    "hubble_workforces_accommodations": {
+        "name": 32,
+        "address": 43
+    },
+    "hubble_workforces_divisions": {
+        "code": 8,
+        "name": 35
+    },
+    "hubble_workforces_designations": {
+        "code": 23,
+        "name": 23,
+        "designation_holdable_type": 30
+    },
+    "hubble_workforces_employment_histories": {
+        "company_name": 38,
+        "business_type": 29,
+        "designation": 42,
+        "last_salary": 4,
+        "reason_for_leaving": 55,
+        "remarks": 68
+    },
+    "hubble_workforces_work_passes": {
+        "number": 12
+    },
+    "hubble_workforces_employment_periods": {
+        "termination_reason": 65,
+        "evaluation_score": 1
+    },
+    "hubble_workforces_disciplinary_records": {
+        "document_ref_no": 43,
+        "description": 450
+    },
+    "hubble_workforces_man_year_entitlements": {
+        "agent_name": 54,
+        "mye_number": 14,
+        "pa_number": 14,
+        "main_contractor": 3,
+        "customer": 0,
+        "issued_warning": 0,
+        "remarks": 0
+    },
+    "hubble_workforces_good_behaviours": {
+        "document_ref_no": 0,
+        "description": 161
+    },
+    "hubble_workforces_courses": {
+        "title": 55
+    },
+    "hubble_workforces_security_bonds": {
+        "insurance_company": 37,
+        "insurance_agent": 36,
+        "security_bond_number": 15,
+        "remarks": 0
+    },
+    "hubble_workforces_injuries": {
+        "injury_date": 10,
+        "injury_description": 413,
+        "main_contractor_name": 0,
+        "policy_number": 33,
+        "broker_name": 23,
+        "claim_description": 3
+    },
+    "hubble_workforces_driving_licenses": {
+        "license_number": 9
+    },
+    "hubble_workforces_educational_levels": {
+        "name": 50
+    },
+    "hubble_workforces_educations": {
+        "institute": 32
+    },
+    "hubble_workforces_course_types": {
+        "name": 48
+    },
+    "hubble_workforces_skill_types": {
+        "name": 48
+    },
+    "hubble_workforces_skills": {
+        "training_centre": 74,
+        "remarks": 97
+    },
+    "hubble_workforces_trades": {
+        "name": 0
+    },
+    "hubble_leave_leave_application_transitions": {
+        "to_state": 12,
+        "metadata": 2
+    },
+    "hubble_safety_risk_levels": {
+        "name": 11,
+        "description": 0
+    },
+    "hubble_attendances_shifts_shifts": {
+        "name": 56,
+        "code": 37
+    },
+    "hubble_safety_permit_logs": {
+        "action": 37,
+        "remark": 323
+    },
+    "hubble_safety_permit_class_checklist_items": {
+        "question": 509,
+        "answer": 299
+    },
+    "hubble_safety_settings_permit_class_checklist_items": {
+        "question": 509
+    },
+    "hubble_safety_settings_permit_class_items": {
+        "question": 281
+    },
+    "hubble_safety_settings_permit_class_checklists": {
+        "name": 166
+    },
+    "hubble_safety_settings_permit_classes": {
+        "name": 166,
+        "description": 184
+    },
+    "hubble_salaries_profiles": {
+        "name": 48,
+        "type": 35
+    },
+    "hubble_attendances_shifts_break_types": {
+        "name": 21,
+        "code": 8
+    },
+    "hubble_safety_inspection_logs": {
+        "remark": 211,
+        "action": 7
+    },
+    "hubble_safety_hk_request_logs": {
+        "remark": 0,
+        "action": 0
+    },
+    "hubble_safety_hk_backcharge_materials": {
+        "description": 0
+    },
+    "hubble_safety_hk_backcharge_labours": {
+        "category": 0
+    },
+    "hubble_safety_hk_backcharge_plants": {
+        "description": 0
+    },
+    "hubble_attendances_shifts_schedules": {
+        "name": 47
+    },
+    "hubble_salaries_settings_allowance_types": {
+        "name": 44,
+        "code": 36
+    },
+    "hubble_salaries_adjustments_recurring_allowance_schedules": {
+        "attributable_level_type": 27
+    },
+    "hubble_salaries_adjustments_recurring_allowances": {
+        "name": 38,
+        "code": 29,
+        "awardable_type": 47
+    },
+    "hubble_salaries_adjustments_daily_awardables": {
+        "applicable_days_rule": 66,
+        "basic_hours_comparator": 2,
+        "ot_hours_comparator": 2,
+        "ph_setting_basic_hours_comparator": 2,
+        "ph_setting_ot_hours_comparator": 2,
+        "ph_setting_holiday_hours_comparator": 2
+    },
+    "hubble_salaries_adjustments_weekly_awardables": {
+        "basic_hours_comparator": 0,
+        "ot_hours_comparator": 0
+    },
+    "hubble_salaries_adjustments_monthly_awardables": {
+        "basic_hours_comparator": 2,
+        "ot_hours_comparator": 0
+    },
+    "hubble_salaries_accounts_adjustments": {
+        "adjustable_type": 53
+    },
+    "hubble_salaries_adjustments_shift_awardables": {
+        "applicable_days_rule": 7,
+        "basic_hours_comparator": 0,
+        "ot_hours_comparator": 0
+    },
+    "hubble_salaries_caps": {
+        "applicable_days": 75
+    },
+    "hubble_job_queues": {
+        "queue": 23,
+        "last_error": 15689,
+        "handler": 5630542,
+        "job_class": 59
+    },
+    "hubble_salaries_settings_deduction_types": {
+        "name": 39,
+        "code": 39
+    },
+    "hubble_salaries_payrolls_payment_structures": {
+        "name": 12
+    },
+    "hubble_salaries_payrolls_holiday_items": {
+        "name": 25,
+        "unit": 6
+    },
+    "hubble_salaries_payrolls_ad_hoc_items": {
+        "name": 42
+    },
+    "hubble_salaries_payrolls_tax_items": {
+        "name": 8
+    },
+    "hubble_salaries_payrolls_donation_items": {
+        "name": 9
+    },
+    "hubble_salaries_payrolls_basic_items": {
+        "name": 61,
+        "unit": 7
+    },
+    "hubble_salaries_settings_bank_accounts": {
+        "bank_code": 4,
+        "bank_name": 4,
+        "branch_no": 7,
+        "account_no": 10,
+        "account_name": 59,
+        "company_identification": 10
+    },
+    "hubble_salaries_payrolls_payment_transitions": {
+        "to_state": 10,
+        "metadata": 2
+    },
+    "hubble_salaries_payrolls_overtime_items": {
+        "name": 12,
+        "unit": 5
+    },
+    "hubble_leave_template_decision_making_processes": {
+        "name": 29
+    },
+    "hubble_salaries_payrolls_employee_payments": {
+        "payment_method": 0,
+        "basic_payment_mode": 11,
+        "overtime_payment_mode": 11,
+        "adjustments_payment_mode": 11
+    },
+    "hubble_salaries_payrolls_payment_schedules": {
+        "name": 24
+    },
+    "hubble_salaries_payrolls_employee_payment_transitions": {
+        "to_state": 9,
+        "metadata": 2
+    },
+    "hubble_salaries_payrolls_adjustment_items": {
+        "name": 39
+    },
+    "hubble_salaries_payrolls_payments": {
+        "name": 24
+    },
+    "hubble_leave_settings_policies": {
+        "policy": 62
+    },
+    "hubble_leave_step_transitions": {
+        "to_state": 8,
+        "metadata": 2
+    },
+    "hubble_leave_settings_award_schedules": {
+        "leave_configuration_type": 49
+    },
+    "hubble_leave_step_transition_remarks": {
+        "content": 59
+    },
+    "hubble_job_progress_trackers": {
+        "job_type": 16,
+        "result_name": 68,
+        "result_directory": 115,
+        "error_msg": 0,
+        "error_stacktrace": 0
+    },
+    "hubble_salaries_payrolls_payment_templates": {
+        "name": 13,
+        "description": 13
+    },
+    "hubble_salaries_accounts_employee_locks": {
+        "remarks": 0
+    },
+    "hubble_salaries_accounts_ad_hoc_items": {
+        "name": 32,
+        "remarks": 0
+    },
+    "hubble_salaries_accounts_company_lock_transitions": {
+        "to_state": 0,
+        "metadata": 0
+    },
+    "hubble_safety_hk_attachments": {
+        "image": 0
+    },
+    "hubble_safety_hk_request_changes": {
+        "remarks": 0
+    },
+    "hubble_safety_inspection_attachments": {
+        "image": 0
+    },
+    "hubble_safety_inspection_changes": {
+        "remarks": 0
+    },
+    "hubble_safety_permit_applicants": {
+        "name": 0,
+        "mobile_number": 0
+    },
+    "hubble_safety_permit_list_items": {
+        "question": 0,
+        "itemable_type": 0
+    },
+    "hubble_safety_permit_changes": {
+        "remarks": 0
+    },
+    "hubble_safety_permit_list_checklists": {
+        "question": 0
+    },
+    "hubble_safety_permit_lists": {
+        "name": 0,
+        "description": 0
+    },
+    "hubble_face_ids_devices": {
+        "java_server_name": 11,
+        "serial_number": 16,
+        "edition": 9,
+        "volume": 1,
+        "weigen": 1,
+        "lan_ip": 12,
+        "gateway": 12,
+        "netmask": 12,
+        "mac_address": 17,
+        "wan_ip": 15,
+        "forwarding_port": 0,
+        "model": 5,
+        "alg_edition": 3
+    },
+    "hubble_face_ids_java_servers": {
+        "name": 11,
+        "password_digest": 60,
+        "endpoint_to_rails": 27,
+        "ip_to_devices": 15,
+        "port_to_devices": 4
+    },
+    "hubble_tonnages_vehicles": {
+        "vehicle_number": 0,
+        "brand": 0,
+        "model": 0
+    },
+    "hubble_tonnages_projects": {
+        "required_collection": 0,
+        "client": 0,
+        "client_contact_number": 0
+    },
+    "hubble_tonnages_load_attachments": {
+        "attachment": 0,
+        "type": 0,
+        "bin_location": 0
+    },
+    "hubble_tonnages_waste_types": {
+        "name": 0,
+        "code": 0
+    },
+    "hubble_tonnages_schedules": {
+        "status": 0,
+        "requestor": 0
+    },
+    "hubble_tonnages_bin_types": {
+        "name": 0,
+        "code": 0
+    },
+    "hubble_machineries_vehicle_brands": {
+        "name": 10
+    },
+    "hubble_vehicle_deployment_vehicle_projects": {
+        "manager": 7,
+        "email": 15,
+        "contact_no": 8
+    },
+    "hubble_machineries_vehicle_types": {
+        "name": 13
+    },
+    "hubble_vehicle_deployment_clients": {
+        "company_name": 6,
+        "company_code": 6,
+        "address1": 0,
+        "address2": 0
+    },
+    "hubble_machineries_vehicle_models": {
+        "name": 13
+    },
+    "hubble_vehicle_deployment_blacklist_reasons": {
+        "name": 0
+    },
+    "hubble_vehicle_deployment_soil_types": {
+        "name": 31,
+        "code": 26
+    },
+    "hubble_vehicle_deployment_project_dumping_grounds": {
+        "dg_to_site": 8,
+        "site_to_dg": 8
+    },
+    "hubble_machineries_vehicles": {
+        "vehicle_number": 9
+    },
+    "hubble_tonnages_service_types": {
+        "code": 0,
+        "name": 0
+    },
+    "hubble_tonnages_loads": {
+        "driver_signature": 0,
+        "client_signature": 0,
+        "remarks": 0,
+        "bin_location": 0,
+        "client_name": 0,
+        "bin_serial_in": 0,
+        "bin_serial_out": 0,
+        "dump_bin_serial_number": 0,
+        "driver_name": 0,
+        "dropping_bin_signature": 0,
+        "dropping_bin_client_name": 0
+    },
+    "hubble_vehicle_deployment_gates": {
+        "name": 35
+    },
+    "hubble_vehicle_deployment_blacklist_records": {
+        "remarks": 0
+    },
+    "hubble_tonnages_vehicle_types": {
+        "name": 0
+    },
+    "hubble_tonnages_dumping_grounds": {
+        "name": 0,
+        "code": 0,
+        "address": 0
+    },
+    "hubble_vehicle_deployment_ticket_attachments": {
+        "attachment": 14
+    },
+    "hubble_vehicle_deployment_dumping_grounds": {
+        "name": 37,
+        "code": 26,
+        "address": 42,
+        "address2": 0,
+        "managed_by": 13,
+        "country": 9
+    },
+    "hubble_vehicle_deployment_tickets": {
+        "ref_num": 62
+    },
+    "hubble_vehicle_deployment_deployments": {
+        "cancel_reason": 58
+    },
+    "hubble_vehicle_deployment_vehicle_requests": {
+        "ref_num": 62,
+        "remarks": 0
+    },
+    "hubble_vehicle_deployment_ticket_infos": {
+        "load_remarks": 53,
+        "dumping_remarks": 111
+    },
+    "hubble_vehicle_deployment_state_machines_deployment_transitions": {
+        "to_state": 22,
+        "metadata": 2
+    },
+    "hubble_task_assignment_job_types": {
+        "name": 67
+    },
+    "hubble_task_assignment_locations": {
+        "zone": 15,
+        "floor": 10,
+        "unit": 31
+    },
+    "hubble_task_assignment_ot_request_logs": {
+        "remarks": 4
+    },
+    "hubble_attendance_based_assignment_assignment_logs": {
+        "remarks": 72
+    },
+    "hubble_task_assignment_task_images": {
+        "attachment": 0
+    },
+    "hubble_task_assignment_unit_types": {
+        "name": 48
+    },
+    "hubble_task_assignment_tasks": {
+        "remarks": 62
+    },
+    "hubble_task_assignments_assignments": {
+        "mode": 8,
+        "assignment_remarks": 148
+    },
+    "hubble_task_assignments_unit_types": {
+        "name": 48
+    },
+    "hubble_task_assignments_notifications": {
+        "registration_token": 174
+    },
+    "hubble_task_assignments_transitions": {
+        "to_state": 25
+    },
+    "hubble_task_assignments_unit_assignments": {
+        "unit_assignment_remarks": 117
+    },
+    "hubble_task_assignments_job_groups": {
+        "name": 21
+    },
+    "hubble_task_assignments_units": {
+        "block": 15,
+        "floor": 10,
+        "unit_no": 31,
+        "bca_score": 0,
+        "status": 1
+    },
+    "hubble_task_assignment_job_groups": {
+        "name": 21
+    },
+    "hubble_task_assignments_ua_transitions": {
+        "to_state": 0
+    },
+    "hubble_task_assignments_job_types": {
+        "name": 24
+    },
+    "hubble_form_builder_forms": {
+        "name": 25,
+        "description": 19
+    },
+    "hubble_form_builder_element_types": {
+        "name": 16,
+        "etype": 15
+    },
+    "hubble_form_builder_submission_attachments": {
+        "file": 0
+    },
+    "hubble_form_builder_elements": {
+        "name": 14,
+        "description": 0,
+        "placeholder": 0
+    },
+    "hubble_form_builder_element_options": {
+        "name": 0
+    },
+    "hubble_form_builder_connections": {
+        "digest": 40,
+        "from_type": 32,
+        "from_id": 1,
+        "to_type": 28,
+        "to_id": 1
+    },
+    "hubble_form_builder_form_sections": {
+        "name": 18
+    },
+    "hubble_form_builder_form_state_transitions": {
+        "to_state": 9
+    },
+    "hubble_form_builder_connections_form_versions": {
+        "hubble_form_builder_connection_digest": 40
+    },
+    "hubble_workflow_builder_workflows": {
+        "name": 13,
+        "status": 5
+    },
+    "hubble_workflow_builder_groups": {
+        "name": 49,
+        "group_type": 11
+    },
+    "hubble_workflow_builder_states": {
+        "name": 24,
+        "description": 0,
+        "state_type": 9
+    },
+    "hubble_workflow_builder_activities": {
+        "name": 50,
+        "description": 0
+    },
+    "hubble_workflow_builder_transitions": {
+        "transition_type": 8
+    },
+    "hubble_workflow_builder_request_data": {
+        "name": 0,
+        "value": 0
+    },
+    "hubble_workflow_builder_action_targets": {
+        "target_type": 10
+    },
+    "hubble_workflow_builder_activity_types": {
+        "name": 25
+    },
+    "hubble_form_builder_form_versions": {
+        "name": 0
+    },
+    "hubble_workflow_builder_action_types": {
+        "name": 7,
+        "description": 1
+    },
+    "hubble_form_builder_submission_values": {
+        "value": 0
+    },
+    "hubble_workflow_builder_images": {
+        "file": 0
+    },
+    "hubble_workflow_builder_action_type_groups": {
+        "name": 17,
+        "description": 96
+    },
+    "hubble_workflow_builder_activity_targets": {
+        "target_type": 0
+    },
+    "hubble_workflow_builder_actions": {
+        "name": 31,
+        "description": 0
+    },
+    "hubble_workflow_builder_logs": {
+        "remarks": 0,
+        "log_type": 0
+    },
+    "hubble_quality_trades": {
+        "name": 10,
+        "status": 5
+    },
+    "hubble_quality_inspection_types": {
+        "name": 13,
+        "status": 5
+    },
+    "hubble_quality_inspections": {
+        "status": 0,
+        "references_number": 0,
+        "description": 0
+    },
+    "hubble_quality_inspection_templates": {
+        "name": 0,
+        "description": 0,
+        "status": 0
+    }
+}
