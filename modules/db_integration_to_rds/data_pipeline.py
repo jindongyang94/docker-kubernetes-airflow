@@ -15,9 +15,17 @@ import time
 import pytz
 from tqdm import tqdm
 
-# import config as cfg
 
 def get_timerange(periodic_mode, last_pivot, curr_pivot, pivot_time, timezone):
+    '''
+    Return the start time and end time to grab data between these times
+    :param periodic_mode:
+    :param last_pivot:
+    :param curr_pivot:
+    :param pivot_time:
+    :param timezone:
+    :return:
+    '''
     if periodic_mode == 'daily':
         today = datetime.date.today()
         last_pivot = today - datetime.timedelta(2)
@@ -49,6 +57,10 @@ def get_timerange(periodic_mode, last_pivot, curr_pivot, pivot_time, timezone):
 
 
 def initial_data_transfer():
+    '''
+    Transfer all existing data end-to-end from production to redshift. Run it the first time only.
+    :return:
+    '''
     logging.basicConfig(level=logging.INFO)
 
     client_df = pd.read_csv(cfg.client_csv)
@@ -296,6 +308,19 @@ def initial_data_transfer():
 
 def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, client_df, dev_conn, dev_cur,
                                  start_time, end_time):
+    '''
+    Transfer a single table from client server to rds temp table
+    :param temp_table:
+    :param table:
+    :param client:
+    :param client_conn_pool:
+    :param client_df:
+    :param dev_conn:
+    :param dev_cur:
+    :param start_time:
+    :param end_time:
+    :return:
+    '''
     client_cur = client_conn_pool[client].cursor()
 
     query = '''
@@ -311,9 +336,11 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
         # error_list.append((m_i, module, t_i, table, c_i, client))
         client_cur.close()
         return False
+
+    # if there is no new data, skip the next part
     if len(result_df) == 0:
         client_cur.close()
-        return False
+        return 'No data'
 
     # result_df = psql.read_sql(query, client_conn_pool[client])
     logging.debug('Number of updated records: %s' % len(result_df))
@@ -393,6 +420,17 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
 
 def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3_file_name,
                                   redshift_iam_role, redshift_region):
+    '''
+    Transfer a single table from s3 to redshift
+    :param temp_table:
+    :param table:
+    :param redshift_cur:
+    :param s3_bucket:
+    :param s3_file_name:
+    :param redshift_iam_role:
+    :param redshift_region:
+    :return:
+    '''
     # create temp table
     query = '''
                         create table %s
@@ -433,17 +471,18 @@ def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3
     redshift_cur.execute(query)
 
 
-def timerange_data_transfer(periodic_mode=True,
-                            start_time=None,
-                            end_time=None,
-                            pivot_time=None,
+def timerange_data_transfer(periodic_mode='daily',
+                            start_time='',
+                            end_time='',
+                            pivot_time='',
                             timezone='Singapore',
 
                             client_csv='',
                             module_table_metadata='',
                             table_client_metadata='',
-                            unused_modules=[],
-                            unused_tables=[],
+
+                            unused_modules=(),
+                            unused_tables=(),
 
                             dev_db=None,
                             prod_db=None,
@@ -454,11 +493,33 @@ def timerange_data_transfer(periodic_mode=True,
 
                             verbose=False,
                             verbose_mode='info'):
+    '''
+    Transfer data between start time and end time
+    :param periodic_mode:
+    :param start_time:
+    :param end_time:
+    :param pivot_time:
+    :param timezone:
+    :param client_csv:
+    :param module_table_metadata:
+    :param table_client_metadata:
+    :param unused_modules:
+    :param unused_tables:
+    :param dev_db:
+    :param prod_db:
+    :param redshift_db:
+    :param redshift_iam_role:
+    :param redshift_region:
+    :param s3_bucket:
+    :param verbose:
+    :param verbose_mode:
+    :return:
+    '''
 
     client_df = pd.read_csv(client_csv)
     client_df = client_df[client_df['client_archive'] != 1]
 
-    # initialize database connections
+    # initialize all database connections
     dev_conn = pg.connect(**dev_db)
     dev_cur = dev_conn.cursor()
     if dev_conn:
@@ -479,6 +540,7 @@ def timerange_data_transfer(periodic_mode=True,
     # get pivot timestamps
     start_time, end_time = get_timerange(periodic_mode, start_time, end_time, pivot_time, timezone)
 
+    # read metadata for looping
     with open(module_table_metadata) as f:
         module_table = json.load(f, object_pairs_hook=OrderedDict)
     with open(table_client_metadata) as f:
@@ -487,26 +549,30 @@ def timerange_data_transfer(periodic_mode=True,
     checkpoint = False
     checkpoint_table = ''
 
+    # 3 nested loops: module level, table level and client level
     for m_i, module in enumerate(module_table, start=1):
-        if module in ['form_builder']:
+        # filter unused modules
+        if module in unused_modules:
             continue
 
         for t_i, table in enumerate(module_table[module], start=1):
+            # filter unused tables
             if table in unused_tables:
                 continue
+
+            # filter table that doesn't exist
             if table not in table_client:
                 continue
+
+            # checkpoint mechanism
             if checkpoint_table:
                 if table == checkpoint_table:
                     checkpoint = True
                 if not checkpoint:
                     continue
 
+            # create temp table to dump new data
             temp_table = 'temp_' + table
-            # drop temp table
-            query = '''drop table if exists %s''' % temp_table
-            dev_cur.execute(query)
-
             query = '''
                     create table %s
                     as (select * from %s where 0=1)
@@ -524,7 +590,7 @@ def timerange_data_transfer(periodic_mode=True,
                                              dev_conn, dev_cur, start_time, end_time)
 
             logging.debug('Copy data to temp file')
-            # write data to csv then
+            # write new data to csv
             with open('temp.csv', mode='w') as f:
                 dev_cur.copy_expert('''COPY %s TO STDOUT WITH (FORMAT CSV)''' % temp_table, f)
 
@@ -535,6 +601,7 @@ def timerange_data_transfer(periodic_mode=True,
             logging.debug(s3_file_name)
             s3.upload_file('temp.csv', s3_bucket, s3_file_name)
 
+            # if there is no new data, skip transferring to redshift
             query = '''
                     select count(*)
                     from %s
@@ -549,6 +616,7 @@ def timerange_data_transfer(periodic_mode=True,
                 dev_cur.execute(query)
                 continue
 
+            # load data from temp table to main table
             logging.debug('Load new records into main table')
             # delete old records
             query = '''
@@ -579,6 +647,7 @@ def timerange_data_transfer(periodic_mode=True,
             dev_conn.commit()
             redshift_conn.commit()
 
+    # clean up
     dev_cur.close()
     dev_conn.close()
 
@@ -597,28 +666,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
-
-    # initial_data_transfer()
-
-    # timerange_data_transfer(periodic_mode=False,
-    #                         start_time='2019-09-01 12:00:00',
-    #                         end_time='2019-09-05 12:00:00',
-    #                         pivot_time=cfg.pivot_time,
-    #                         timezone='Singapore',
-    #
-    #                         client_csv=cfg.client_csv,
-    #                         module_table_metadata='metadata/table_module_mapping.json',
-    #                         table_client_metadata='metadata/table_client_usage.json',
-    #
-    #                         dev_db=cfg.dev_db,
-    #                         prod_db=cfg.prod_db,
-    #                         redshift_db=cfg.redshift_db,
-    #                         redshift_iam_role=cfg.redshift_iam_role,
-    #                         redshift_region=cfg.redshift_region,
-    #                         s3_bucket=cfg.s3_bucket,
-    #
-    #                         verbose=True
-    #                         )
 
     with open('config.json') as f:
         cfg = json.load(f, object_pairs_hook=OrderedDict)
