@@ -7,7 +7,7 @@ import os
 import glob
 import tqdm
 
-import config as cfg
+import modules.db_integration_to_rds.config as cfg
 
 import datetime
 

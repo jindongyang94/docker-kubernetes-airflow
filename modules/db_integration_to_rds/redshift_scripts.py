@@ -8,7 +8,7 @@ import glob
 import tqdm
 import logging
 
-import config as cfg
+import modules.db_integration_to_rds.config as cfg
 
 import math
 import pprint
