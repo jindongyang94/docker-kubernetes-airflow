@@ -559,8 +559,6 @@ def periodic_data_transfer(periodic_mode='daily',
             # filter unused tables
             if table in unused_tables:
                 continue
-
-            # filter table that doesn't exist
             if table not in table_client:
                 continue
 
