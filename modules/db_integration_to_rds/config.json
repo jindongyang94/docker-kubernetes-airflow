@@ -1,0 +1,60 @@
+{
+    "periodic_mode": "no",
+    "pivot_time": "04:00:00",
+    "start_time": "2019-09-05 12:00:00",
+    "end_time": "2019-09-09 12:00:00",
+    "timezone": "Singapore",
+    "module_table_meta": "metadata/table_module_mapping.json",
+    "table_client_meta": "metadata/table_client_usage.json",
+    "module_list": [
+        "attendance",
+        "form_builder",
+        "leave",
+        "machineries",
+        "project",
+        "quality",
+        "safety",
+        "rights",
+        "salaries",
+        "task_assignment",
+        "tonnages",
+        "user",
+        "vehicle_deployment",
+        "workflow_builder",
+        "workforces",
+        "other"
+    ],
+    "unused_modules": [
+        "form_builder"
+    ],
+    "unused_tables": [
+        "hubble_job_queues",
+        "hubble_job_queues_job_buffers"
+    ],
+    "postgres_templates_dir": "postgres_templates",
+    "redshift_templates_dir": "redshift_templates",
+    "client_csv": "hubble_clients_clients.csv",
+    "dev_db": {
+        "host": "hubblebase.cmgdthsodgpa.ap-southeast-1.rds.amazonaws.com",
+        "port": "5432",
+        "user": "hubbledev_db",
+        "password": "hubadmin!",
+        "database": "data-attendance"
+    },
+    "client_db": {
+        "host": "proddbreplica.ckkr7jwtdz4y.us-west-2.rds.amazonaws.com",
+        "port": "5432",
+        "user": "hubbledb",
+        "password": "N0VERM!ND"
+    },
+    "redshift_db": {
+        "host": "rs-attendance.clug9mtqmy9j.ap-southeast-1.redshift.amazonaws.com",
+        "port": "5439",
+        "user": "awsuser",
+        "password": "Hubble123",
+        "database": "dev"
+    },
+    "redshift_iam_role": "arn:aws:iam::175416825336:role/RedshiftS3Access",
+    "redshift_region": "ap-southeast-1",
+    "s3_bucket": "warehouse-attendance"
+}
