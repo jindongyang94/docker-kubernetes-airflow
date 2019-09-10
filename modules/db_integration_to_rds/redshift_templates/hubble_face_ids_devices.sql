@@ -1,0 +1,35 @@
+
+create table hubble_face_ids_devices
+(
+"client_server_id" smallint,
+"id" integer,
+"java_server_name" varchar(16),
+"serial_number" varchar(24),
+"edition" varchar(13),
+"volume" varchar(1),
+"weigen" varchar(1),
+"lan_ip" varchar(18),
+"gateway" varchar(18),
+"netmask" varchar(18),
+"mac_address" varchar(25),
+"wan_ip" varchar(22),
+"forwarding_port" varchar(1),
+"max_manager_number" integer,
+"real_manager_number" integer,
+"max_face_register" integer,
+"real_face_register" integer,
+"max_face_record" integer,
+"real_face_record" integer,
+"max_employee" integer,
+"real_employee" integer,
+"max_other" integer,
+"real_other" integer,
+"model" varchar(7),
+"alg_edition" varchar(4),
+"manager_lock" boolean,
+"check_type" integer,
+"created_at" timestamp without time zone,
+"updated_at" timestamp without time zone,
+primary key ("client_server_id", "id")
+)
+compound sortkey("client_server_id", "id")
