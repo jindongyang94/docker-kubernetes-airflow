@@ -38,14 +38,14 @@ def run(instance_filters=None, database_filters=None, table_filters=None):
 
     for db in dbs:
         instance = db['DBInstanceIdentifier']
-        dbuser = db['MasterUsername']
+        user = db['MasterUsername']
         endpoint = db['Endpoint']
         host = endpoint['Address']
         port = endpoint['Port']
         location = str(db['DBInstanceArn'].split(':')[3])
 
         print('instance:', instance)
-        print('dbuser:', dbuser)
+        print('user:', user)
         print('endpoint:', endpoint)
         print('host:', host)
         print('port:', port)
@@ -53,7 +53,7 @@ def run(instance_filters=None, database_filters=None, table_filters=None):
 
         print ("\nAccessing instance %s ..." % instance)
 
-        pg = PGHelper(db='postgres', host=host, port=port, dbuser=dbuser)
+        pg = PGHelper(dbname='postgres', host=host, port=port, user=user)
         con = pg.conn()
         cur = con.cursor()
 

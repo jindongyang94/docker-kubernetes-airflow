@@ -334,27 +334,39 @@ class RDSHelper():
         return dbs
 
 class PGHelper():
-    def __init__(self, db, host, port, dbuser):
+    def __init__(self, dbname, host, port, user=None, type_db='prod'):
+        self.types = ['prod', 'dev', 'redshift']
+        self.dbname = dbname
         # get the password if there is such a thing
-        self.db = db
-        self.password = os.environ.get('PG_PASS')
+        if type_db in self.types:
+            if type_db == 'prod':
+                if user:
+                    self.user = user
+                else:
+                    self.user = os.environ.get('PROD_PGUSER')
+                self.password = os.environ.get('PROD_PGPASS')
+            elif type_db == 'dev':
+                self.user = os.environ.get('DEV_PGUSER')
+                self.password = os.environ.get('DEV_PGPASS')
+            elif type_db == 'redshift':
+                self.user = os.environ.get('REDSHIFT_USER')
+                self.password = os.environ.get('REDSHIFT_PASS')
         self.host = host
         self.port = port
-        self.dbuser = dbuser
+        
     
     def conn(self, database=None):
         """
         Connect with or without password depending on PG PASS evironment variable.
         """
         if database:
-            self.db = database
+            self.dbname = database
 
         if self.password:
-            # logger.info('Password:', self.password)
             con = psycopg2.connect(
-                dbname=self.db, host=self.host, port=self.port, user=self.dbuser, password=self.password)
+                dbname=self.dbname, host=self.host, port=self.port, user=self.user, password=self.password)
         else:
             con = psycopg2.connect(
-                dbname=self.db, host=self.host, port=self.port, user=self.dbuser)
+                dbname=self.dbname, host=self.host, port=self.port, user=self.user)
 
         return con
