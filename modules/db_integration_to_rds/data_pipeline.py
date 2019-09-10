@@ -306,7 +306,7 @@ def initial_data_transfer():
     error_df.to_csv('errors.csv', index=False)
 
 
-def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, client_df, dev_conn, dev_cur,
+def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, client_df, dev_conn,
                                  start_time, end_time):
     '''
     Transfer a single table from client server to rds temp table
@@ -322,6 +322,7 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
     :return:
     '''
     client_cur = client_conn_pool[client].cursor()
+    dev_cur = dev_conn.cursor()
 
     query = '''
             SELECT *
@@ -340,6 +341,7 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
     # if there is no new data, skip the next part
     if len(result_df) == 0:
         client_cur.close()
+        dev_cur.close()
         return 'No data'
 
     # result_df = psql.read_sql(query, client_conn_pool[client])
@@ -416,9 +418,10 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
         dev_cur.execute(query)
 
     client_cur.close()
+    dev_cur.close()
 
 
-def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3_file_name,
+def transfer_table_s3_to_redshift(temp_table, table, redshift_conn, s3_bucket, s3_file_name,
                                   redshift_iam_role, redshift_region):
     '''
     Transfer a single table from s3 to redshift
@@ -431,6 +434,8 @@ def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3
     :param redshift_region:
     :return:
     '''
+
+    redshift_cur = redshift_conn.cursor()
     # create temp table
     query = '''
                         create table %s
@@ -470,6 +475,8 @@ def transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3
     query = '''drop table %s''' % temp_table
     redshift_cur.execute(query)
 
+    redshift_cur.close()
+
 
 def periodic_data_transfer(periodic_mode='daily',
                            start_time='',
@@ -478,8 +485,8 @@ def periodic_data_transfer(periodic_mode='daily',
                            timezone='Singapore',
 
                            client_csv='',
-                           module_table_metadata='',
-                           table_client_metadata='',
+                           module_table_meta='',
+                           table_client_meta='',
 
                            unused_modules=(),
                            unused_tables=(),
@@ -541,9 +548,9 @@ def periodic_data_transfer(periodic_mode='daily',
     start_time, end_time = get_timerange(periodic_mode, start_time, end_time, pivot_time, timezone)
 
     # read metadata for looping
-    with open(module_table_metadata) as f:
+    with open(module_table_meta) as f:
         module_table = json.load(f, object_pairs_hook=OrderedDict)
-    with open(table_client_metadata) as f:
+    with open(table_client_meta) as f:
         table_client = json.load(f, object_pairs_hook=OrderedDict)
 
     checkpoint = False
@@ -585,7 +592,7 @@ def periodic_data_transfer(periodic_mode='daily',
                              )
 
                 transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, client_df,
-                                             dev_conn, dev_cur, start_time, end_time)
+                                             dev_conn, start_time, end_time)
 
             logging.debug('Copy data to temp file')
             # write new data to csv
@@ -639,7 +646,7 @@ def periodic_data_transfer(periodic_mode='daily',
 
             # transfer data to redshift
             logging.debug('Upload data to Redshift')
-            transfer_table_s3_to_redshift(temp_table, table, redshift_cur, s3_bucket, s3_file_name,
+            transfer_table_s3_to_redshift(temp_table, table, redshift_conn, s3_bucket, s3_file_name,
                                           redshift_iam_role, redshift_region)
 
             dev_conn.commit()
@@ -677,8 +684,8 @@ if __name__ == '__main__':
                            timezone=cfg['timezone'],
 
                            client_csv=cfg['client_csv'],
-                           module_table_metadata=cfg['module_table_meta'],
-                           table_client_metadata=cfg['table_client_meta'],
+                           module_table_meta=cfg['module_table_meta'],
+                           table_client_meta=cfg['table_client_meta'],
                            unused_modules=cfg['unused_modules'],
                            unused_tables=cfg['unused_tables'],
 
@@ -689,3 +696,4 @@ if __name__ == '__main__':
                            redshift_region=cfg['redshift_region'],
                            s3_bucket=cfg['s3_bucket'],
                            )
+    # periodic_data_transfer(**cfg)
