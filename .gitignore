@@ -30,3 +30,6 @@ __pycache__
 
 # YAML Files
 secrets.yaml
+
+# Pycharm
+.DS_Store
