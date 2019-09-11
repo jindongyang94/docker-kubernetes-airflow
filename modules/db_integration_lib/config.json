@@ -37,22 +37,16 @@
     "dev_db": {
         "host": "hubblebase.cmgdthsodgpa.ap-southeast-1.rds.amazonaws.com",
         "port": "5432",
-        "user": "hubbledev_db",
-        "password": "hubadmin!",
-        "database": "data-attendance"
+        "dbname": "data-attendance"
     },
-    "client_db": {
+    "prod_db": {
         "host": "proddbreplica.ckkr7jwtdz4y.us-west-2.rds.amazonaws.com",
-        "port": "5432",
-        "user": "hubbledb",
-        "password": "N0VERM!ND"
+        "port": "5432"
     },
     "redshift_db": {
         "host": "rs-attendance.clug9mtqmy9j.ap-southeast-1.redshift.amazonaws.com",
         "port": "5439",
-        "user": "awsuser",
-        "password": "Hubble123",
-        "database": "dev"
+        "dbname": "dev"
     },
     "redshift_iam_role": "arn:aws:iam::175416825336:role/RedshiftS3Access",
     "redshift_region": "ap-southeast-1",

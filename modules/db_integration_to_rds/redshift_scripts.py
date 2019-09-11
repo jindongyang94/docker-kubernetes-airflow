@@ -6,18 +6,20 @@ import pandas.io.sql as psql
 import os
 import glob
 import tqdm
-import logging
-
-import modules.db_integration_to_rds.config as cfg
-
 import math
 import pprint
 import json
 from collections import OrderedDict
 
+from modules.db_integration_lib.helper import PGHelper, logger
+
+with open("../db_integration_lib/config.json", 'r') as f:
+    cfg = json.loads(f)
+
 
 def generate_redshift_templates():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     for table in cfg.module_tables:
@@ -71,7 +73,8 @@ create table %s
 
 
 def optimize_type():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     for table in cfg.module_tables:
@@ -103,20 +106,18 @@ def optimize_type():
 
 
 def create_tables():
-    logging.basicConfig(level=logging.INFO)
-    logging.getLogger(__name__)
-
     client_df = pd.read_csv(cfg.client_csv)
-    logging.debug(len(client_df))
-    logging.debug(client_df.head())
+    logger.debug(len(client_df))
+    logger.debug(client_df.head())
 
-    redshift_conn = pg.connect(**cfg.redshift_db)
+    postgres = PGHelper(**cfg.redshift_db, type_db='redshift')
+    redshift_conn = postgres.conn()
     redshift_cur = redshift_conn.cursor()
-    logging.info('Connect to Redshift cluster successfully')
+    logger.info('Connect to Redshift cluster successfully')
 
     for table in cfg.module_tables:
         sql_dir = cfg.rs_dir + '/' + table + '.sql'
-        logging.info('Run %s' % sql_dir)
+        logger.info('Run %s' % sql_dir)
         with open(sql_dir, mode='r') as f:
             query = f.read()
 
@@ -128,7 +129,8 @@ def create_tables():
 
 
 def create_client_table():
-    redshift_conn = pg.connect(**cfg.redshift_db)
+    postgres = PGHelper(**cfg.redshift_db, type_db='redshift')
+    redshift_conn = postgres.conn()
     redshift_cur = redshift_conn.cursor()
 
     query = '''
@@ -163,9 +165,10 @@ def scan_database_to_optimize_type():
     table_column_len = {}
 
     for row_id, client_row in tqdm.tqdm(client_df.iterrows()):
-        logging.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
+        logger.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
 
-        client_conn = pg.connect(**cfg.prod_db, database=client_row['client_name'])
+        postgres = PGHelper(**cfg.prod_db, dbname=client_row['client_name'], type_db='prod')
+        client_conn = postgres.conn()
         client_cur = client_conn.cursor()
 
         query = '''
@@ -212,7 +215,8 @@ def handle_array_type(table, column):
 
     max_length = 0
     for client in table_client[table]:
-        client_conn = pg.connect(**cfg.prod_db, database=client)
+        postgres = PGHelper(**cfg.prod_db, dbname=client, type_db='prod')
+        client_conn = postgres.conn()
         client_cur = client_conn.cursor()
 
         query = '''
@@ -283,7 +287,8 @@ compound sortkey(%s)
 
 
 def create_all_tables():
-    redshift_conn = pg.connect(**cfg.redshift_db)
+    postgres = PGHelper(**cfg.redshift_db, type_db='redshift')
+    redshift_conn = postgres.conn()
     redshift_cur = redshift_conn.cursor()
 
     sql_dir = 'redshift_templates'

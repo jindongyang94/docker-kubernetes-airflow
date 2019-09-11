@@ -10,7 +10,7 @@ import progressbar
 import boto3
 import psycopg2
 
-from modules.db_integration_to_s3.helper import RDSHelper, S3Helper, PGHelper, DATALAKE_NAME, logger, DATABASE_TAGS, INSTANCE_TAGS, TABLE_TAGS
+from modules.db_integration_lib.helper import RDSHelper, S3Helper, PGHelper, DATALAKE_NAME, logger, DATABASE_TAGS, INSTANCE_TAGS, TABLE_TAGS
 
 """
 The idea of this script is to find the respective database instances using Boto3, and then find the 
@@ -197,7 +197,7 @@ def individual_company_migration(instance_details, database_name, table_filters)
 
                     # Download the file to local storage first, then utilizing it - always save it under /tmp/ directory
                     # The file will also be deleted from s3
-                    local_csvpath = s3.download_latest(full_folder_path)
+                    local_csvpath = s3.download_latest(full_folder_path, local_csvname)
                     with open(local_csvpath, 'a') as csvfile:
                         # Append by downloading the existing csv and append locally.
                         logger.info ("Writing rows into current local CSV File...")

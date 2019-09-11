@@ -3,7 +3,6 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from modules.db_integration_to_rds.auto_transfer import handler as centralizedrds_pipeline_daily
 from modules.db_integration_to_s3.daily_migration import describe_all_instances, individual_company_migration, TABLE_TAGS
 
 from datetime import datetime
@@ -14,8 +13,6 @@ This script would be used to orchestrate all activities in the k8 container
 using airflow to schedule and sequence every task in place.
 """
 
-##############################################################################################################################
-# Daily DAG Pipeline ---------------------------------------------------------------------------------------------------------
 PARENT_DAG_NAME = 'daily_etl_pipeline'
 S3_SUBDAG_NAME = 's3_pipeline'
 

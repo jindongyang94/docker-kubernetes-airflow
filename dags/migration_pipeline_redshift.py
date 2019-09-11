@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from modules.db_integration_to_rds.auto_transfer import handler as centralizedrds_pipeline_daily
+from modules.db_integration_to_rds.data_pipeline import periodic_data_transfer as centralizedrds_pipeline_daily
 
 from datetime import datetime
 from datetime import timedelta

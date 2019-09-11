@@ -8,7 +8,7 @@ from datetime import datetime
 import boto3
 import psycopg2
 
-from .helper import RDSHelper, PGHelper, S3Helper, DATALAKE_NAME
+from modules.db_integration_lib.helper import RDSHelper, PGHelper, S3Helper, DATALAKE_NAME
 
 """
 The idea of this script is a simplified version of a daily migration script, refreshing the s3 lake for a specific duration. 

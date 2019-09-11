@@ -1,27 +1,26 @@
 import pandas as pd
 import psycopg2 as pg
 import pandas.io.sql as psql
+import boto3
 
-import logging
 import os
 import glob
 import tqdm
-
-import modules.db_integration_to_rds.config as cfg
-
 import datetime
-
-import boto3
-
 import time
 from collections import OrderedDict
 import json
-
 import pprint
+
+from modules.db_integration_lib.helper import PGHelper, logger
+
+with open("../db_integration_lib/config.json", 'r') as f:
+    cfg = json.loads(f)
 
 
 def create_template():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     for table in cfg.module_tables:
@@ -35,7 +34,8 @@ def create_template():
 
 
 def add_column_client_id():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     # rename table columns
@@ -54,7 +54,8 @@ def add_column_client_id():
 
 
 def prepend_column_name():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     table_list = ["'%s'" % t for t in cfg.module_tables]
@@ -94,7 +95,7 @@ def crawl_database():
     table_client = {}
 
     for row_id, client_row in client_df.iterrows():
-        logging.info('Loading data (%d/%d) from %s' % (row_id+1, len(client_df), client_row['client_name']))
+        logger.info('Loading data (%d/%d) from %s' % (row_id+1, len(client_df), client_row['client_name']))
 
         client_conn = pg.connect(**cfg.prod_db, database=client_row['client_name'])
         client_cur = client_conn.cursor()
@@ -122,7 +123,7 @@ def crawl_database():
 
     table_column = {}
     for row_id, client_row in tqdm.tqdm(client_df.iterrows()):
-        # logging.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
+        # logger.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
 
         client_conn = pg.connect(**cfg.prod_db, database=client_row['client_name'])
         client_cur = client_conn.cursor()
@@ -186,7 +187,8 @@ create table %s
 
 
 def create_all_table():
-    dev_conn = pg.connect(**cfg.dev_db)
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
     sql_dir = 'postgres_templates'
@@ -235,9 +237,10 @@ def check_usage():
     table_client_usage = {}
 
     for row_id, client_row in client_df.iterrows():
-        logging.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
+        logger.info('Loading data (%d/%d) from %s' % (row_id + 1, len(client_df), client_row['client_name']))
 
-        client_conn = pg.connect(**cfg.prod_db, database=client_row['client_name'])
+        postgres = PGHelper(**cfg.prod_db, dbname=client_row['client_name'], type_db='prod')
+        client_conn = postgres.conn()
         client_cur = client_conn.cursor()
 
         query = '''
@@ -270,8 +273,6 @@ from (
 
 
 if __name__ == '__main__':
-    logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO)
 
     # create_template()
     # add_column_client_id()

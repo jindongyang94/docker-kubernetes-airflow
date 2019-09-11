@@ -88,6 +88,7 @@ TABLE_TAGS = None
 # Class Methods (Should encapsulate all s3 and rds methods to make the work easier to undestand) ----------------------------------
 class S3Helper:
     """
+    Encapuslate all AWS S3 Functions
     Data Lake will reside in Singapore. This is so that our future research can be done locally. 
     """
     def __init__(self):
@@ -168,7 +169,7 @@ class S3Helper:
         return deleted_keys
 
 
-    def download_latest(self, full_folder_path):
+    def download_latest(self, full_folder_path, local_csvname):
         """
         Return csv filename with the latest timestamp from the folder path
         """
@@ -193,8 +194,7 @@ class S3Helper:
             if not selected_key:
                 raise ValueError('The selected timestamp (%s) could not be found. Please check code or s3 bucket.' % timestamp)
             
-            keyname = selected_key.split('/')[-1]
-            local_keypath = '/tmp/' + keyname
+            local_keypath = '/tmp/' + local_csvname
             bucket.download_file(selected_key, local_keypath)
 
             logger.info ("Local CSV File: %s" % local_keypath)
@@ -322,6 +322,9 @@ class S3Helper:
         return result
 
 class RDSHelper():
+    """
+    Encapuslate all AWS RDS Functions
+    """
     def __init__(self, *args, **kwargs):
         self.client = boto3.client("rds", region_name='us-west-2')
 
@@ -334,16 +337,16 @@ class RDSHelper():
         return dbs
 
 class PGHelper():
+    """
+    Encapuslate all PostGres Functions
+    """
     def __init__(self, dbname, host, port, user=None, type_db='prod'):
         self.types = ['prod', 'dev', 'redshift']
         self.dbname = dbname
         # get the password if there is such a thing
         if type_db in self.types:
             if type_db == 'prod':
-                if user:
-                    self.user = user
-                else:
-                    self.user = os.environ.get('PROD_PGUSER')
+                self.user = os.environ.get('PROD_PGUSER')
                 self.password = os.environ.get('PROD_PGPASS')
             elif type_db == 'dev':
                 self.user = os.environ.get('DEV_PGUSER')
@@ -351,6 +354,9 @@ class PGHelper():
             elif type_db == 'redshift':
                 self.user = os.environ.get('REDSHIFT_USER')
                 self.password = os.environ.get('REDSHIFT_PASS')
+        # if user is provided, we will override the environment variable
+        if user:
+            self.user = user
         self.host = host
         self.port = port
         

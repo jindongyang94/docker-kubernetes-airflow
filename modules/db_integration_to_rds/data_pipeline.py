@@ -5,7 +5,6 @@ import pandas.io.sql as psql
 import boto3
 
 import os
-import logging
 import json
 from collections import OrderedDict
 from pprint import pprint
@@ -14,6 +13,8 @@ import datetime
 import time
 import pytz
 from tqdm import tqdm
+
+from modules.db_integration_lib.helper import PGHelper, logger
 
 
 def get_timerange(periodic_mode, last_pivot, curr_pivot, pivot_time, timezone):
@@ -46,7 +47,7 @@ def get_timerange(periodic_mode, last_pivot, curr_pivot, pivot_time, timezone):
         else:
             last_pivot = datetime.datetime.fromisoformat(last_pivot)
 
-    logging.info('Pull data from %s to %s (%s timezone)' % (last_pivot, curr_pivot, timezone))
+    logger.info('Pull data from %s to %s (%s timezone)' % (last_pivot, curr_pivot, timezone))
 
     # convert time to UTC
     local_tz = pytz.timezone(timezone)
@@ -61,17 +62,18 @@ def initial_data_transfer():
     Transfer all existing data end-to-end from production to redshift. Run it the first time only.
     :return:
     '''
-    logging.basicConfig(level=logging.INFO)
 
     client_df = pd.read_csv(cfg.client_csv)
     client_df = client_df[client_df['client_archive'] != 1]
 
-    logging.info('Connect to dev database')
-    dev_conn = pg.connect(**cfg.dev_db)
+    logger.info('Connect to dev database')
+    postgres = PGHelper(**cfg.dev_db, type_db='dev')
+    dev_conn = postgres.conn()
     dev_cur = dev_conn.cursor()
 
-    logging.info('Connect to Redshift cluster')
-    redshift_conn = pg.connect(**cfg.redshift_db)
+    logger.info('Connect to Redshift cluster')
+    postgres = PGHelper(**cfg.redshift_db, type_db='redshift')
+    redshift_conn = postgres.conn()
     redshift_cur = redshift_conn.cursor()
 
     s3 = boto3.client('s3')
@@ -86,7 +88,7 @@ def initial_data_transfer():
     local_tz = pytz.timezone(timezone)
     first_pivot = local_tz.localize(first_pivot)
 
-    logging.info('Pull data till %s' % first_pivot)
+    logger.info('Pull data till %s' % first_pivot)
 
     with open('metadata/table_module_mapping.json') as f:
         table_module = json.load(f, object_pairs_hook=OrderedDict)
@@ -139,7 +141,7 @@ def initial_data_transfer():
                     #     break
                     # count += 1
 
-                    logging.info('Processing %s module (%s/%s) - %s table (%s/%s) - %s client (%s/%s)'
+                    logger.info('Processing %s module (%s/%s) - %s table (%s/%s) - %s client (%s/%s)'
                                  % (module.upper(), m_i, len(table_module),
                                     table.upper(), t_i, len(table_module[module]),
                                     client.upper(), c_i, len(table_client[table]))
@@ -239,14 +241,14 @@ def initial_data_transfer():
 
                     pbar.update(1)
 
-                # logging.info('Copy data to s3 bucket')
+                # logger.info('Copy data to s3 bucket')
                 # write data to csv then
                 # copy data to s3
                 # with open('temp.txt', mode='w') as f:
                 #     dev_cur.copy_to(f, table, sep='|')
                 #
                 # s3_file_name = '%s/%s/%s_%s.txt' % (module, table, table, first_pivot.date())
-                # logging.debug(s3_file_name)
+                # logger.debug(s3_file_name)
                 # # print(s3_file_name)
                 # s3.upload_file('temp.txt', cfg.s3_bucket, s3_file_name)
 
@@ -254,12 +256,12 @@ def initial_data_transfer():
                     dev_cur.copy_expert('''COPY %s TO STDOUT WITH (FORMAT CSV)''' % table, f)
 
                 s3_file_name = '%s/%s/%s_%s.csv' % (module, table, table, first_pivot.date())
-                logging.debug(s3_file_name)
+                logger.debug(s3_file_name)
                 # print(s3_file_name)
                 s3.upload_file('temp.csv', cfg.s3_bucket, s3_file_name)
 
                 # transfer data to redshift
-                # logging.info('Upload data to Redshift')
+                # logger.info('Upload data to Redshift')
 
                 # make sure table empty by truncating
                 query = '''
@@ -280,10 +282,10 @@ def initial_data_transfer():
                 # -- delimiter '|'
                 # -- maxerror 2
 
-                # logging.info('Transfer %s table successfully' % table)
+                # logger.info('Transfer %s table successfully' % table)
                 # t_end = time.time()
-                # logging.info('Transfer %s table took %s seconds' % (table, round(t_end - t_start)))
-                # logging.info('Process took %s seconds so far' % (round(t_end - t_1)))
+                # logger.info('Transfer %s table took %s seconds' % (table, round(t_end - t_start)))
+                # logger.info('Process took %s seconds so far' % (round(t_end - t_1)))
 
                 dev_conn.commit()
                 redshift_conn.commit()
@@ -345,7 +347,7 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
         return 'No data'
 
     # result_df = psql.read_sql(query, client_conn_pool[client])
-    logging.debug('Number of updated records: %s' % len(result_df))
+    logger.debug('Number of updated records: %s' % len(result_df))
 
     # get column types
     query = '''
@@ -359,12 +361,12 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
 
     # handle extra columns
     # if len(result_df.columns) > len(type_df['column_name']):
-    #     logging.info('Inconsistent schema. Using merging strategy: %s extra columns' % merge_strat.upper())
+    #     logger.info('Inconsistent schema. Using merging strategy: %s extra columns' % merge_strat.upper())
     #     if merge_strat == 'drop':
     #         type_cols = [col_name.replace(entity_mapping[table] + '_', '') for col_name in
     #                      type_df['column_name']]
     #         drop_cols = result_df.columns.difference(type_cols)
-    #         logging.debug('Drop columns: %s' % list(drop_cols))
+    #         logger.debug('Drop columns: %s' % list(drop_cols))
     #         result_df = result_df.drop(columns=drop_cols)
     #     elif merge_strat == 'keep':
     #         # to be implemented
@@ -383,7 +385,7 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
     mismatches = list(mismatches)
     if len(mismatches) == 1 and mismatches[0] == '':
         mismatches = []
-    logging.debug('Mismatches: %s' % list(mismatches))
+    logger.debug('Mismatches: %s' % list(mismatches))
 
     # convert to compatible types
     for col in mismatches:
@@ -397,7 +399,7 @@ def transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, cl
     client_id = int(client_df[client_df['client_name'] == client]['client_id'].iloc[0])
     result_df['client_server_id'] = int(client_id)
 
-    logging.debug('Copy data to temp table')
+    logger.debug('Copy data to temp table')
     # write queries to temp table
     # copy file to s3 (in the future)
     result_df.to_csv('tmp.csv', index=False)
@@ -530,17 +532,17 @@ def periodic_data_transfer(periodic_mode='daily',
     dev_conn = pg.connect(**dev_db)
     dev_cur = dev_conn.cursor()
     if dev_conn:
-        logging.info('Connect to dev database successfully')
+        logger.info('Connect to dev database successfully')
 
     redshift_conn = pg.connect(**redshift_db)
     redshift_cur = redshift_conn.cursor()
     if redshift_conn:
-        logging.info('Connect to Redshift cluster successfully')
+        logger.info('Connect to Redshift cluster successfully')
 
     client_conn_pool = {client: pg.connect(**prod_db, database=client)
                         for client in client_df['client_name']}
     if all(client_conn_pool.values()):
-        logging.info('Connect to all client servers successfully')
+        logger.info('Connect to all client servers successfully')
 
     s3 = boto3.client('s3')
 
@@ -585,7 +587,7 @@ def periodic_data_transfer(periodic_mode='daily',
             dev_cur.execute(query)
 
             for c_i, client in enumerate(table_client[table], start=1):
-                logging.info('Processing %s module (%s/%s) - %s table (%s/%s) - %s client (%s/%s)'
+                logger.info('Processing %s module (%s/%s) - %s table (%s/%s) - %s client (%s/%s)'
                              % (module.upper(), m_i, len(module_table),
                                 table.upper(), t_i, len(module_table[module]),
                                 client.upper(), c_i, len(table_client[table]))
@@ -594,7 +596,7 @@ def periodic_data_transfer(periodic_mode='daily',
                 transfer_table_client_to_rds(temp_table, table, client, client_conn_pool, client_df,
                                              dev_conn, start_time, end_time)
 
-            logging.debug('Copy data to temp file')
+            logger.debug('Copy data to temp file')
             # write new data to csv
             with open('temp.csv', mode='w') as f:
                 dev_cur.copy_expert('''COPY %s TO STDOUT WITH (FORMAT CSV)''' % temp_table, f)
@@ -603,7 +605,7 @@ def periodic_data_transfer(periodic_mode='daily',
             s3_file_name = '%s/%s/%s_%s_%s.csv' % (module, table, table,
                                                    start_time.strftime("%Y-%m-%d %H:%M:%S"),
                                                    end_time.strftime("%Y-%m-%d %H:%M:%S"))
-            logging.debug(s3_file_name)
+            logger.debug(s3_file_name)
             s3.upload_file('temp.csv', s3_bucket, s3_file_name)
 
             # if there is no new data, skip transferring to redshift
@@ -613,7 +615,7 @@ def periodic_data_transfer(periodic_mode='daily',
                     ''' % temp_table
             dev_cur.execute(query)
             count = dev_cur.fetchone()[0]
-            logging.info('Total number of updated rows: %s' % count)
+            logger.info('Total number of updated rows: %s' % count)
 
             if count == 0:
                 # drop temp table
@@ -622,7 +624,7 @@ def periodic_data_transfer(periodic_mode='daily',
                 continue
 
             # load data from temp table to main table
-            logging.debug('Load new records into main table')
+            logger.debug('Load new records into main table')
             # delete old records
             query = '''
                     delete from %s
@@ -645,7 +647,7 @@ def periodic_data_transfer(periodic_mode='daily',
             dev_cur.execute(query)
 
             # transfer data to redshift
-            logging.debug('Upload data to Redshift')
+            logger.debug('Upload data to Redshift')
             transfer_table_s3_to_redshift(temp_table, table, redshift_conn, s3_bucket, s3_file_name,
                                           redshift_iam_role, redshift_region)
 
@@ -667,10 +669,6 @@ def periodic_data_transfer(periodic_mode='daily',
 
 
 if __name__ == '__main__':
-    logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s %(levelname)s: %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
 
     with open('config.json') as f:
         cfg = json.load(f, object_pairs_hook=OrderedDict)

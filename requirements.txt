@@ -2,3 +2,4 @@ boto3
 botocore
 psycopg2-binary>=2.8.3
 progressbar2>=3.42.0
+tqdm>=4.32.2
