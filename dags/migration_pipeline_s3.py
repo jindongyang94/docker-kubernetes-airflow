@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from modules.db_integration_to_s3.daily_migration import describe_all_instances, individual_company_migration, TABLE_TAGS
+from db_integration_to_s3.daily_migration import describe_all_instances, individual_company_migration, TABLE_TAGS
 
 from datetime import datetime
 from datetime import timedelta
@@ -40,11 +40,11 @@ with DAG(
 ) as dag:
 
     start_task = DummyOperator(
-        task_id = 'start_of_daily_pipeline'
+        task_id = 'start_of_s3_pipeline'
     )
 
     end_task = DummyOperator(
-        task_id = 'end_daily_pipeline'
+        task_id = 'end_of_s3_pipeline'
     )
     
     # ------------ S3 TASK ------------------------------  

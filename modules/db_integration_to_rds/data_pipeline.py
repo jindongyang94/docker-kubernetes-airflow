@@ -14,8 +14,12 @@ import time
 import pytz
 from tqdm import tqdm
 
-from modules.db_integration_lib.helper import PGHelper, logger
+from db_integration_lib.helper import PGHelper, logger
 
+def parse_config(config_path):
+    with open(config_path) as f:
+        config = json.load(f, object_pairs_hook=OrderedDict)
+    return config
 
 def get_daily_timerange(pivot_time, timezone):
     today = datetime.date.today()
@@ -34,17 +38,8 @@ def get_daily_timerange(pivot_time, timezone):
 
     return start_time, end_time
 
-
-def parse_config():
-    with open('config.json') as f:
-        config = json.load(f, object_pairs_hook=OrderedDict)
-    return config
-
-
-def transfer_table_from_client_to_rds(table, client, client_id, start_time, end_time):
+def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time, end_time):
     logger.info('%s client' % client.upper())
-
-    cfg = parse_config()
 
     temp_table = 'temp_' + table
 
@@ -135,9 +130,7 @@ def transfer_table_from_client_to_rds(table, client, client_id, start_time, end_
     os.remove('temp.csv')
 
 
-def transfer_table_from_all_client_to_rds_and_s3(module, table, start_time, end_time):
-    cfg = parse_config()
-
+def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time, end_time):
     with open(cfg['table_client_meta']) as f:
         table_client = json.load(f, object_pairs_hook=OrderedDict)
 
@@ -164,7 +157,7 @@ def transfer_table_from_all_client_to_rds_and_s3(module, table, start_time, end_
 
     for c_i, client in enumerate(table_client[table], start=1):
         client_id = int(client_df[client_df['client_name'] == client]['client_id'].iloc[0])
-        transfer_table_from_client_to_rds(table, client, client_id, start_time, end_time)
+        transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time, end_time)
 
     logger.debug('Copy data to temp file')
     # write new data to csv
@@ -233,8 +226,7 @@ def transfer_table_from_all_client_to_rds_and_s3(module, table, start_time, end_
     return count
 
 
-def transfer_table_from_s3_to_redshift(module, table, start_time, end_time):
-    cfg = parse_config()
+def transfer_table_from_s3_to_redshift(cfg, module, table, start_time, end_time):
 
     redshift_conn = pg.connect(**cfg['redshift_db'])
     redshift_cur = redshift_conn.cursor()
@@ -293,9 +285,8 @@ def transfer_table_from_s3_to_redshift(module, table, start_time, end_time):
     redshift_conn.close()
 
 
-def transfer_module(module, start_time, end_time):
+def transfer_module(cfg, module, start_time, end_time):
     logger.info('%s module' % module.upper())
-    cfg = parse_config()
 
     with open(cfg['module_table_meta']) as f:
         module_table = json.load(f, object_pairs_hook=OrderedDict)
@@ -309,16 +300,14 @@ def transfer_module(module, start_time, end_time):
             continue
 
         logger.info('%s table' % table.upper())
-        count = transfer_table_from_all_client_to_rds_and_s3(module, table, start_time, end_time)
+        count = transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time, end_time)
         if count == 0:
             continue
         logger.info('Copy to redshift')
         transfer_table_from_s3_to_redshift(module, table, start_time, end_time)
 
 
-def transfer_all_module():
-    cfg = parse_config()
-
+def transfer_all_module(cfg):
     start_time, end_time = get_daily_timerange(cfg['pivot_time'], cfg['timezone'])
 
     with open(cfg['module_table_meta']) as f:
@@ -328,10 +317,10 @@ def transfer_all_module():
         if module in cfg['unused_modules']:
             continue
 
-        transfer_module(module, start_time, end_time)
+        transfer_module(cfg, module, start_time, end_time)
 
 
 if __name__ == '__main__':
-
-    transfer_all_module()
+    cfg = parse_config("../db_integration_lib/config.json")
+    transfer_all_module(cfg)
 

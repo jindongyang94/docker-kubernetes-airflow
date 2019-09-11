@@ -100,7 +100,7 @@ airflow:
     repository: 175416825336.dkr.ecr.ap-southeast-1.amazonaws.com/airflow
     ##
     ## image tag
-    tag: 1.01.5
+    tag: 1.01.6
     ##
     ## Image pull policy
     ## values: Always or IfNotPresent

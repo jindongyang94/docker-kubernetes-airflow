@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from modules.db_integration_to_rds.data_pipeline import get_daily_timerange, parse_config, transfer_module
+from db_integration_to_rds.data_pipeline import get_daily_timerange, parse_config, transfer_module
 
 from datetime import datetime
 from datetime import timedelta
@@ -43,20 +43,21 @@ with DAG(
 ) as dag:
 
     start_task = DummyOperator(
-        task_id = 'start_of_daily_pipeline'
+        task_id = 'start_of_redshift_pipeline'
     )
 
     end_task = DummyOperator(
-        task_id = 'end_daily_pipeline'
+        task_id = 'end_of_redshift_pipeline'
     )
 
     # ------------ REDSHIFT TASK ------------------------
-    cfg = parse_config()
+    config_path = "./modules/db_integration_lib/config.json"
+    cfg = parse_config(config_path)
     start_time, end_time = get_daily_timerange(cfg['pivot_time'], cfg['timezone'])
     
-    with open(cfg['module_table_meta']) as f:
+    with open("./modules/db_integration_to_rds/metadata/table_module_mapping.json") as f:
         module_table = json.load(f, object_pairs_hook=OrderedDict)
-    
+
     for module in module_table:
         if module in cfg['unused_modules']:
             continue  
@@ -67,6 +68,7 @@ with DAG(
             task_id = task_id,
             python_callable = transfer_module,
             op_kwargs={
+                'cfg': cfg,
                 'module': module,
                 'start_time': start_time,
                 'end_time': end_time
