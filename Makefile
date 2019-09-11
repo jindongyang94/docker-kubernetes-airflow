@@ -26,6 +26,10 @@ scheduler:
 worker:
 	docker exec -it $(shell docker ps -q --filter label=name=worker) /entrypoint.sh bash
 
+# Check what Docker Tag No. it is currently in AWS ECR Docker Repository
+tag:
+	sh script/push_docker.sh
+
 # Push Current Local Docker Image to SAME Tag to AWS ECR Docker Repository
 pushcurrent: build
 	sh script/push_docker.sh current
