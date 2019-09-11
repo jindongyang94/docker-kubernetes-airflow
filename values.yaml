@@ -59,13 +59,13 @@ airflow:
       valueFrom:
         secretKeyRef:
           name: airflow-hubble
-          key: redshit_user
+          key: redshift_user
     # Redshift Password
     - name: REDSHIFT_PASS
       valueFrom:
         secretKeyRef:
           name: airflow-hubble
-          key: redshit_pass
+          key: redshift_pass
           
 
 
@@ -100,7 +100,7 @@ airflow:
     repository: 175416825336.dkr.ecr.ap-southeast-1.amazonaws.com/airflow
     ##
     ## image tag
-    tag: 1.01.4
+    tag: 1.01.5
     ##
     ## Image pull policy
     ## values: Always or IfNotPresent
