@@ -30,12 +30,43 @@ airflow:
         secretKeyRef:
           name: airflow-hubble
           key: aws_secret_access_key
+    # Production PG User
+    - name: PROD_PGUSER
+      valueFrom:
+        secretKeyRef:
+          name: airflow-hubble
+          key: prod_pguser
     # Production PG Password
-    - name: PG_PASS
+    - name: PROD_PGPASS
       valueFrom:
         secretKeyRef:
           name: airflow-hubble
           key: prod_pgpass
+    # Development PG User
+    - name: DEV_PGUSER
+      valueFrom:
+        secretKeyRef:
+          name: airflow-hubble
+          key: dev_pguser
+    # Development PG Password
+    - name: DEV_PGPASS
+      valueFrom:
+        secretKeyRef:
+          name: airflow-hubble
+          key: dev_pgpass
+    # Redshift User
+    - name: REDSHIFT_USER
+      valueFrom:
+        secretKeyRef:
+          name: airflow-hubble
+          key: redshit_user
+    # Redshift Password
+    - name: REDSHIFT_PASS
+      valueFrom:
+        secretKeyRef:
+          name: airflow-hubble
+          key: redshit_pass
+          
 
 
   ##

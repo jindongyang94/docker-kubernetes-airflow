@@ -44,7 +44,7 @@ def describe_all_instances():
 
     for db in dbs:
             instance = db['DBInstanceIdentifier']
-            dbuser = db['MasterUsername']
+            user = db['MasterUsername']
             endpoint = db['Endpoint']
             host = endpoint['Address']
             port = endpoint['Port']
@@ -52,7 +52,7 @@ def describe_all_instances():
 
             logger.info("Accessing instance %s ..." % instance)
 
-            pg = PGHelper(db='postgres', host=host, port=port, dbuser=dbuser)
+            pg = PGHelper(dbname='postgres', host=host, port=port, user=user)
             con = pg.conn()
             cur = con.cursor()
 
@@ -85,13 +85,13 @@ def describe_all_instances():
 def individual_company_migration(instance_details, database_name, table_filters):
 
     instance = instance_details['DBInstanceIdentifier']
-    dbuser = instance_details['MasterUsername']
+    user = instance_details['MasterUsername']
     endpoint = instance_details['Endpoint']
     host = endpoint['Address']
     port = endpoint['Port']
     location = str(instance_details['DBInstanceArn'].split(':')[3])
 
-    pg = PGHelper(db='postgres', host=host, port=port, dbuser=dbuser)
+    pg = PGHelper(dbname='postgres', host=host, port=port, user=user)
     logger.info("Accessing %s ..." % database_name)
     con = pg.conn(database=database_name)
     cur = con.cursor()
@@ -250,14 +250,14 @@ def full_database_migration(instance_filters=None, database_filters=None, table_
 
     for db in dbs:
         instance = db['DBInstanceIdentifier']
-        dbuser = db['MasterUsername']
+        user = db['MasterUsername']
         endpoint = db['Endpoint']
         host = endpoint['Address']
         port = endpoint['Port']
         location = str(db['DBInstanceArn'].split(':')[3])
 
         logger.info('instance: %s' % instance)
-        logger.info('dbuser: %s' % dbuser)
+        logger.info('user: %s' % user)
         logger.info('endpoint: %s' % endpoint)
         logger.info('host: %s' % host)
         logger.info('port: %s' % port)
@@ -265,7 +265,7 @@ def full_database_migration(instance_filters=None, database_filters=None, table_
 
         logger.info ("Accessing instance %s ..." % instance)
 
-        pg = PGHelper(db='postgres', host=host, port=port, dbuser=dbuser)
+        pg = PGHelper(dbname='postgres', host=host, port=port, user=user)
         con = pg.conn()
         cur = con.cursor()
 
