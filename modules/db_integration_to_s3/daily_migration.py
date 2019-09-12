@@ -123,106 +123,106 @@ def individual_company_migration(instance_details, database_name, table_filters)
     for j in range(len(table_names)):
         table_name = table_names[j]
 
-        # Rerun for the table when the exception fails
-        while True:
-            try:
-                # Save individual tables to CSV first - as we are sending one table at a time, we can del the csv files
-                # as soon as we have uploaded them
-                logger.info("Accessing %s ..." % table_name)
-                # We will save the time based on the latest commit time. Thus, there will be only one file for one table all time
-                # However, they might be of different timestamp due to difference in commit time.
-                
-                s3 = S3Helper()
-                # Extract latest timestamp separately here:
-                # Use this query to extract the latest commit timestamp at that point of time
-                extract_ts_query = "SELECT MAX(pg_xact_commit_timestamp(xmin)) FROM " + table_name + " WHERE pg_xact_commit_timestamp(xmin) IS NOT NULL;"
-                cur.execute(extract_ts_query)
-                latest_timestamp = str(cur.fetchone()[0])
+        # # Rerun for the table when the exception fails
+        # try:
+        
+        # Save individual tables to CSV first - as we are sending one table at a time, we can del the csv files
+        # as soon as we have uploaded them
+        logger.info("Accessing %s ..." % table_name)
+        # We will save the time based on the latest commit time. Thus, there will be only one file for one table all time
+        # However, they might be of different timestamp due to difference in commit time.
+        
+        s3 = S3Helper()
+        # Extract latest timestamp separately here:
+        # Use this query to extract the latest commit timestamp at that point of time
+        extract_ts_query = "SELECT MAX(pg_xact_commit_timestamp(xmin)) FROM " + table_name + " WHERE pg_xact_commit_timestamp(xmin) IS NOT NULL;"
+        cur.execute(extract_ts_query)
+        latest_timestamp = str(cur.fetchone()[0])
 
-                # Define needed timestamp to set the csvname we are using.
-                if latest_timestamp and latest_timestamp != 'None':
-                    logger.info ("Latest Commit Timestamp from PostGres is: %s" % latest_timestamp)
-                    latest_csvtimestamp = s3._convert_s3timestamp(latest_timestamp)
-                
-                # However, if there is no timestamp at all, then use 24 '0's as the default. 
-                else:
-                    logger.info ("No Commit Timestamp available in PostGres. Using default.")
-                    latest_csvtimestamp = '0' * 24
-                
-                csvname = table_name + "-" + latest_csvtimestamp + ".csv"
-                local_csvname = database_name + "-" + csvname
+        # Define needed timestamp to set the csvname we are using.
+        if latest_timestamp and latest_timestamp != 'None':
+            logger.info ("Latest Commit Timestamp from PostGres is: %s" % latest_timestamp)
+            latest_csvtimestamp = s3._convert_s3timestamp(latest_timestamp)
+        
+        # However, if there is no timestamp at all, then use 24 '0's as the default. 
+        else:
+            logger.info ("No Commit Timestamp available in PostGres. Using default.")
+            latest_csvtimestamp = '0' * 24
+        
+        csvname = table_name + "-" + latest_csvtimestamp + ".csv"
+        local_csvname = database_name + "-" + csvname
 
-                # Respective paths needed
-                full_folder_path = ("%s/%s/%s/%s") % (DATALAKE_NAME, instance, database_name, table_name)
-                full_table_path = "%s/%s/%s/%s/%s" % (DATALAKE_NAME, instance, database_name, table_name, csvname)
-                s3_path = ("s3://%s") % (full_table_path)
+        # Respective paths needed
+        full_folder_path = ("%s/%s/%s/%s") % (DATALAKE_NAME, instance, database_name, table_name)
+        full_table_path = "%s/%s/%s/%s/%s" % (DATALAKE_NAME, instance, database_name, table_name, csvname)
+        s3_path = ("s3://%s") % (full_table_path)
 
-                # Grab the latest_timestamp from the folder. Ideally, there should only be one file under each table folder, but
-                # we will still segregate them as such for easy referencing.
-                table_timestamp = s3.latest_s3timestamp(full_folder_path)
+        # Grab the latest_timestamp from the folder. Ideally, there should only be one file under each table folder, but
+        # we will still segregate them as such for easy referencing.
+        table_timestamp = s3.latest_s3timestamp(full_folder_path)
 
-                # If we could not get a proper timestamp from s3, it means there is no initial file. 
-                if not table_timestamp:
-                    logger.info ("No CSV found in the respective S3 folder. Exporting all rows from table %s to csv." %  table_name)
-                    local_csvpath = '/tmp/' + local_csvname
-                    with open(local_csvpath, "w") as csvfile:
-                        # Get all of the rows and export them
-                        export_query = "COPY " + table_name + " TO STDOUT WITH CSV HEADER"
-                        cur.copy_expert(export_query, csvfile)
-                
-                else:
-                    logger.info ("CSV File found with Commit Timestamp: %s." % table_timestamp)
-                    # Since the timestamp is down to the last milisecond, it is almost impossible for it be miss any rows.
-                    # Thus, to save processing time, we share ignore any need to update the table csv if the timestamp is the same.
-                    table_csvtimestamp = s3._convert_s3timestamp(table_timestamp) 
-                    if table_csvtimestamp == latest_csvtimestamp:
-                        logger.info ("The latest Commit Timestamp (%s) and the latest S3 Timestamp (%s) are the same. Proceeeding to next table."
-                        % (latest_timestamp, table_timestamp))
-                        logger.info('\n')
-                        break
-
-                    # If timestamp is 0000.. , we should just use the min datetime to prevent error.
-                    if table_csvtimestamp == '0' * 24:
-                        table_timestamp = datetime.min
-                    
-                    # Get only the rows after the committed timestamp retrieved and append that to the current csv.
-                    # If there is no results, just go to the next table
-                    export_query = "SELECT * FROM " + table_name + " WHERE pg_xact_commit_timestamp(xmin) > %s "
-                    cur.execute(export_query, (table_timestamp,))
-                    results = cur.fetchall()
-                    if not results:
-                        logger.info ("No new rows or updates from the current Database.")
-                        logger.info('\n')
-                        break
-
-                    # Download the file to local storage first, then utilizing it - always save it under /tmp/ directory
-                    # The file will also be deleted from s3
-                    local_csvpath = s3.download_latest(full_folder_path, local_csvname)
-                    with open(local_csvpath, 'a') as csvfile:
-                        # Append by downloading the existing csv and append locally.
-                        logger.info ("Writing rows into current local CSV File...")
-                        for row in results:
-                            writer = csv.writer(csvfile)
-                            writer.writerow(row)
-                    
-                # Upload the file to the respective bucket - Replacing or uploading uses the same function
-                # This way of uploading would not resetting the entire path, so it is fine to not add a check.
-                s3.create_folder(full_folder_path, location)
-                s3.upload(local_csvpath, full_table_path)
-                latest_timestamp = s3._convert_timestamp(latest_csvtimestamp)
-                logger.info ('FILE PUT AT: %s with Latest Committed Time (%s)' % (s3_path, latest_timestamp))
-
-                # Deleting file from /tmp/ after use
-                os.remove(local_csvpath)
-                logger.info ('Local File Deleted: %s' % local_csvpath)
+        # If we could not get a proper timestamp from s3, it means there is no initial file. 
+        if not table_timestamp:
+            logger.info ("No CSV found in the respective S3 folder. Exporting all rows from table %s to csv." %  table_name)
+            local_csvpath = '/tmp/' + local_csvname
+            with open(local_csvpath, "w") as csvfile:
+                # Get all of the rows and export them
+                export_query = "COPY " + table_name + " TO STDOUT WITH CSV HEADER"
+                cur.copy_expert(export_query, csvfile)
+        
+        else:
+            logger.info ("CSV File found with Commit Timestamp: %s." % table_timestamp)
+            # Since the timestamp is down to the last milisecond, it is almost impossible for it be miss any rows.
+            # Thus, to save processing time, we share ignore any need to update the table csv if the timestamp is the same.
+            table_csvtimestamp = s3._convert_s3timestamp(table_timestamp) 
+            if table_csvtimestamp == latest_csvtimestamp:
+                logger.info ("The latest Commit Timestamp (%s) and the latest S3 Timestamp (%s) are the same. Proceeeding to next table."
+                % (latest_timestamp, table_timestamp))
                 logger.info('\n')
                 break
+
+            # If timestamp is 0000.. , we should just use the min datetime to prevent error.
+            if table_csvtimestamp == '0' * 24:
+                table_timestamp = datetime.min
             
-            except psycopg2.Error as e:
-                logger.error(e.pgerror)
-                logger.info("Retrying for %s table." % table_name)
+            # Get only the rows after the committed timestamp retrieved and append that to the current csv.
+            # If there is no results, just go to the next table
+            export_query = "SELECT * FROM " + table_name + " WHERE pg_xact_commit_timestamp(xmin) > %s "
+            cur.execute(export_query, (table_timestamp,))
+            results = cur.fetchall()
+            if not results:
+                logger.info ("No new rows or updates from the current Database.")
                 logger.info('\n')
-                continue
+                break
+
+            # Download the file to local storage first, then utilizing it - always save it under /tmp/ directory
+            # The file will also be deleted from s3
+            local_csvpath = s3.download_latest(full_folder_path, local_csvname)
+            with open(local_csvpath, 'a') as csvfile:
+                # Append by downloading the existing csv and append locally.
+                logger.info ("Writing rows into current local CSV File...")
+                for row in results:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(row)
+            
+        # Upload the file to the respective bucket - Replacing or uploading uses the same function
+        # This way of uploading would not resetting the entire path, so it is fine to not add a check.
+        s3.create_folder(full_folder_path, location)
+        s3.upload(local_csvpath, full_table_path)
+        latest_timestamp = s3._convert_timestamp(latest_csvtimestamp)
+        logger.info ('FILE PUT AT: %s with Latest Committed Time (%s)' % (s3_path, latest_timestamp))
+
+        # Deleting file from /tmp/ after use
+        os.remove(local_csvpath)
+        logger.info ('Local File Deleted: %s' % local_csvpath)
+        logger.info('\n')
+        break
+        
+        # except psycopg2.Error as e:
+        #     logger.error(e.pgerror)
+        #     logger.info("Retrying for %s table." % table_name)
+        #     logger.info('\n')
+        #     continue
     return
             
 

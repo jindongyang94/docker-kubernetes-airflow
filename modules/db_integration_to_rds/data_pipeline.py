@@ -43,10 +43,12 @@ def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time,
 
     temp_table = 'temp_' + table
 
-    client_conn = pg.connect(**cfg['client_db'], database=client)
+    client_postgres = PGHelper(**cfg['prod_db'], dbname=client, type_db='prod')
+    client_conn = client_postgres.conn()
     client_cur = client_conn.cursor()
 
-    dev_conn = pg.connect(**cfg['dev_db'])
+    dev_postgres = PGHelper(**cfg['dev_db'], type_db='dev')
+    dev_conn = dev_postgres.conn()
     dev_cur = dev_conn.cursor()
 
     query = '''
@@ -139,7 +141,8 @@ def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time,
 
     s3 = boto3.client('s3')
 
-    dev_conn = pg.connect(**cfg['dev_db'])
+    dev_postgres = PGHelper(**cfg['dev_db'], type_db='dev')
+    dev_conn = dev_postgres.conn()
     dev_cur = dev_conn.cursor()
 
     temp_table = 'temp_' + table
@@ -228,7 +231,8 @@ def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time,
 
 def transfer_table_from_s3_to_redshift(cfg, module, table, start_time, end_time):
 
-    redshift_conn = pg.connect(**cfg['redshift_db'])
+    redshift_postgres = PGHelper(**cfg['redshift_db'], type_db='redshift')
+    redshift_conn = redshift_postgres.conn()
     redshift_cur = redshift_conn.cursor()
 
     s3_file_name = '%s/%s/%s_%s_%s.csv' % (module, table, table,
