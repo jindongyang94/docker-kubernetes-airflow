@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from db_integration_to_rds.data_pipeline import get_daily_timerange, parse_config, transfer_module
+from db_migration.db_migration_to_rds.data_pipeline import get_daily_timerange, parse_config, transfer_module
 
 from datetime import datetime
 from datetime import timedelta
@@ -51,11 +51,11 @@ with DAG(
     )
 
     # ------------ REDSHIFT TASK ------------------------
-    config_path = "./modules/db_integration_lib/config.json"
+    config_path = "./modules/db_migration/db_migration_lib/config.json"
     cfg = parse_config(config_path)
     start_time, end_time = get_daily_timerange(cfg['pivot_time'], cfg['timezone'])
     
-    with open("./modules/db_integration_to_rds/metadata/table_module_mapping.json") as f:
+    with open("./modules/db_migration/db_migration_to_rds/metadata/table_module_mapping.json") as f:
         module_table = json.load(f, object_pairs_hook=OrderedDict)
 
     for module in module_table:

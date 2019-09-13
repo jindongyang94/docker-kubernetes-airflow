@@ -10,7 +10,7 @@ import progressbar
 import boto3
 import psycopg2
 
-from db_integration_lib.helper import RDSHelper, S3Helper, PGHelper, DATALAKE_NAME, logger, DATABASE_TAGS, INSTANCE_TAGS, TABLE_TAGS
+from db_migration.db_migration_lib.helper import RDSHelper, S3Helper, PGHelper, DATALAKE_NAME, logger, DATABASE_TAGS, INSTANCE_TAGS, TABLE_TAGS
 
 """
 The idea of this script is to find the respective database instances using Boto3, and then find the 

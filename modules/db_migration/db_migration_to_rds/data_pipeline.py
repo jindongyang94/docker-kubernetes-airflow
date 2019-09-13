@@ -14,7 +14,7 @@ import time
 import pytz
 from tqdm import tqdm
 
-from db_integration_lib.helper import PGHelper, logger
+from db_migration.db_migration_lib.helper import PGHelper, logger
 
 def parse_config(config_path):
     with open(config_path) as f:
@@ -65,7 +65,7 @@ def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time,
         dev_cur.close()
         return 'No data'
 
-    logger.debug('Number of updated records: %s' % len(result_df))
+    logger.info('Number of updated records: %s' % len(result_df))
 
     # get column types
     query = '''
@@ -89,7 +89,7 @@ def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time,
     mismatches = list(mismatches)
     if len(mismatches) == 1 and mismatches[0] == '':
         mismatches = []
-    logger.debug('Mismatches: %s' % list(mismatches))
+    logger.info('Mismatches: %s' % list(mismatches))
 
     # convert to compatible types
     for col in mismatches:
@@ -103,13 +103,14 @@ def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time,
     # client_id = int(client_df[client_df['client_name'] == client]['client_id'].iloc[0])
     result_df['client_server_id'] = int(client_id)
 
-    logger.debug('Copy data to temp table')
-    result_df.to_csv('temp.csv', index=False)
+    logger.info('Copy data to temp table')
+    local_csvfile = temp_table + "_" + client + ".csv"
+    result_df.to_csv(local_csvfile, index=False)
     save_cols = list(result_df.columns)
     save_cols = ['"%s"' % c for c in save_cols]
     save_cols = ', '.join(save_cols)
 
-    with open('temp.csv', mode='r') as f:
+    with open(local_csvfile, mode='r') as f:
         next(f)
         dev_cur.copy_expert('''COPY %s (%s) FROM STDIN WITH (FORMAT CSV)''' % (temp_table, save_cols), f)
 
@@ -129,7 +130,7 @@ def transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time,
     dev_cur.close()
     dev_conn.close()
 
-    os.remove('temp.csv')
+    os.remove(local_csvfile)
 
 
 def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time, end_time):
@@ -161,18 +162,19 @@ def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time,
     for c_i, client in enumerate(table_client[table], start=1):
         client_id = int(client_df[client_df['client_name'] == client]['client_id'].iloc[0])
         transfer_table_from_client_to_rds(cfg, table, client, client_id, start_time, end_time)
-
-    logger.debug('Copy data to temp file')
+    
+    local_csvfile = temp_table + ".csv"
+    logger.info('Copy data to temp file: %s' % local_csvfile)
     # write new data to csv
-    with open('temp.csv', mode='w') as f:
+    with open(local_csvfile , mode='w') as f:
         dev_cur.copy_expert('''COPY %s TO STDOUT WITH (FORMAT CSV)''' % temp_table, f)
 
     # transfer data to s3
     s3_file_name = '%s/%s/%s_%s_%s.csv' % (module, table, table,
                                            start_time.strftime("%Y-%m-%d %H:%M:%S"),
                                            end_time.strftime("%Y-%m-%d %H:%M:%S"))
-    logger.debug(s3_file_name)
-    s3.upload_file('temp.csv', cfg['s3_bucket'], s3_file_name)
+    logger.info(s3_file_name)
+    s3.upload_file(local_csvfile , cfg['s3_bucket'], s3_file_name)
 
     # if there is no new data, skip transferring to redshift
     query = '''
@@ -191,11 +193,11 @@ def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time,
         dev_cur.close()
         dev_conn.close()
 
-        os.remove('temp.csv')
+        os.remove(local_csvfile)
         return 0
 
     # load data from temp table to main table
-    logger.debug('Load new records into main table')
+    logger.info('Load new records into main table')
     # delete old records
     query = '''
             delete from %s
@@ -225,7 +227,7 @@ def transfer_table_from_all_client_to_rds_and_s3(cfg, module, table, start_time,
     dev_cur.close()
     dev_conn.close()
 
-    os.remove('temp.csv')
+    os.remove(local_csvfile)
     return count
 
 
@@ -308,7 +310,7 @@ def transfer_module(cfg, module, start_time, end_time):
         if count == 0:
             continue
         logger.info('Copy to redshift')
-        transfer_table_from_s3_to_redshift(module, table, start_time, end_time)
+        transfer_table_from_s3_to_redshift(cfg, module, table, start_time, end_time)
 
 
 def transfer_all_module(cfg):
@@ -325,6 +327,6 @@ def transfer_all_module(cfg):
 
 
 if __name__ == '__main__':
-    cfg = parse_config("../db_integration_lib/config.json")
+    cfg = parse_config("../db_migration/db_migration_lib/config.json")
     transfer_all_module(cfg)
 

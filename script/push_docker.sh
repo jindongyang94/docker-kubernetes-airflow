@@ -35,6 +35,7 @@ case "$1" in
         docker build --rm -t ${AIRFLOW_LOCAL_DOCKER}:${AIRFLOW_LOCAL_TAG} .
         $(aws ecr get-login --no-include-email --region ap-southeast-1)
         docker tag hubble/docker-airflow:latest ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_CURRENT_ECR_TAG}
+        aws ecr batch-delete-image --repository-name ${AIRFLOW_ECR_DOCKER} --image-ids imageTag=${AIRFLOW_CURRENT_ECR_TAG}
         docker push ${AIRFLOW_ECR_DOCKER}:${AIRFLOW_CURRENT_ECR_TAG}
         ;;
 esac

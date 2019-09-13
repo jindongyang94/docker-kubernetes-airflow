@@ -4,8 +4,8 @@
     "start_time": "2019-09-05 12:00:00",
     "end_time": "2019-09-09 12:00:00",
     "timezone": "Singapore",
-    "module_table_meta": "metadata/table_module_mapping.json",
-    "table_client_meta": "metadata/table_client_usage.json",
+    "module_table_meta": "./modules/db_migration/db_migration_to_rds/metadata/table_module_mapping.json",
+    "table_client_meta": "./modules/db_migration/db_migration_to_rds/metadata/table_client_usage.json",
     "module_list": [
         "attendance",
         "form_builder",
@@ -33,7 +33,7 @@
     ],
     "postgres_templates_dir": "postgres_templates",
     "redshift_templates_dir": "redshift_templates",
-    "client_csv": "hubble_clients_clients.csv",
+    "client_csv": "./modules/db_migration/db_migration_to_rds/metadata/hubble_clients_clients.csv",
     "dev_db": {
         "host": "hubblebase.cmgdthsodgpa.ap-southeast-1.rds.amazonaws.com",
         "port": "5432",

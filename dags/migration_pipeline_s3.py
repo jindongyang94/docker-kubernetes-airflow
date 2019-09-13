@@ -3,7 +3,7 @@ from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-from db_integration_to_s3.daily_migration import describe_all_instances, individual_company_migration, TABLE_TAGS
+from db_migration.db_migration_to_s3.daily_migration import describe_all_instances, individual_company_migration, TABLE_TAGS
 
 from datetime import datetime
 from datetime import timedelta
