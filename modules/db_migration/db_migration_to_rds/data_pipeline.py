@@ -31,10 +31,10 @@ def get_daily_timerange(pivot_time, timezone):
     start_time = datetime.datetime.combine(start_time, pivot_time)
     end_time = datetime.datetime.combine(end_time, pivot_time)
 
-    # convert time to UTC
-    local_tz = pytz.timezone(timezone)
-    start_time = local_tz.localize(start_time)
-    end_time = local_tz.localize(end_time)
+    # # convert time to UTC
+    # local_tz = pytz.timezone(timezone)
+    # start_time = local_tz.localize(start_time)
+    # end_time = local_tz.localize(end_time)
 
     return start_time, end_time
 

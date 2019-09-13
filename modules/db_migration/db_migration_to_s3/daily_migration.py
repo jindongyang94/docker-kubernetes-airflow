@@ -91,7 +91,7 @@ def individual_company_migration(instance_details, database_name, table_filters)
     port = endpoint['Port']
     location = str(instance_details['DBInstanceArn'].split(':')[3])
 
-    pg = PGHelper(dbname='postgres', host=host, port=port, user=user)
+    pg = PGHelper(dbname='postgres', host=host, port=port, user=user, type_db='prod')
     logger.info("Accessing %s ..." % database_name)
     con = pg.conn(database=database_name)
     cur = con.cursor()
