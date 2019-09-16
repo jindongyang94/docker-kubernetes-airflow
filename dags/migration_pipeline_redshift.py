@@ -25,7 +25,7 @@ default_args = {
     'owner': 'airflow',
     'start_date': start_date,
     'depends_on_past': False,
-    'email': ['dongyang@hubble.sg'],
+    'email': ['dongyang@hubble.sg', 'duy.le@hubble.sg'],
     'email_on_failure': True,
     'email_on_retry': False,
     'email_on_success': False,
