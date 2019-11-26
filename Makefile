@@ -30,10 +30,13 @@ worker:
 tag:
 	sh script/push_docker.sh
 
+git:
+	sh script/push_docker.sh git
+
 # Push Current Local Docker Image to SAME Tag to AWS ECR Docker Repository
 pushcurrent: build
 	sh script/push_docker.sh current
-
+	
 # Push Current Local Docker Image to NEXT Tag to AWS ECR Docker Repository
 pushnext: build
 	sh script/push_docker.sh next
